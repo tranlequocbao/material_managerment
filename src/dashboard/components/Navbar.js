@@ -1,92 +1,119 @@
 import {
-    DesktopOutlined,
-    FileOutlined,
-    PieChartOutlined,
-    TeamOutlined,
-    UserOutlined,
-  } from '@ant-design/icons';
-  import { Breadcrumb, Layout, Menu } from 'antd';
-  import React, { useState } from 'react';
-  import '../Styles/Dashboard.css'
-  import Img from "../../Assets/to_readme/Logobg.png"
-  const { Header, Content, Footer, Sider } = Layout;
-  
-  function getItem(label, key, icon, children) {
-    return {
-      key,
-      icon,
-      children,
-      label,
-    };
-  }
-  
-  const items = [
-    getItem('Option 1', '1', <PieChartOutlined />),
-    getItem('Option 2', '2', <DesktopOutlined />),
-    getItem('User', 'sub1', <UserOutlined />, [
-      getItem('Tom', '3'),
-      getItem('Bill', '4'),
-      getItem('Alex', '5'),
-    ]),
-    getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
-    getItem('Files', '9', <FileOutlined />),
-  ];
-  
-  const Navbar = () => {
-    const [collapsed, setCollapsed] = useState(false);
-    return (
-      <Layout
-        style={{
-          minHeight: '100vh',
-        }}
-      >
-        <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-          <div className="logo">
-           <img src={Img} alt="Hình banner" className='logoThaco'/>
+  DesktopOutlined,
+  FileOutlined,
+  PieChartOutlined,
+  TeamOutlined,
+  UserOutlined,
+  ExportOutlined,
+  ImportOutlined
+} from '@ant-design/icons';
+
+import { Breadcrumb, Tooltip, Layout, Menu } from 'antd';
+
+import React, { useState } from 'react';
+import '../Styles/Dashboard.css'
+import Img from "../../Assets/to_readme/Logobg.png"
+const { Header, Content, Footer, Sider } = Layout;
+
+function getItem(label, key, icon, children) {
+  return {
+    key,
+    icon,
+    children,
+    label,
+  };
+}
+
+const items = [
+  getItem(
+    <Tooltip placement="right" title="Báo cáo tồn kho" arrowPointAtCenter>Báo cáo tồn kho</Tooltip>,
+    'exist',
+    <PieChartOutlined />
+  ),
+  getItem(
+    <Tooltip placement="right" title="Chức năng nhập xuất kho" arrowPointAtCenter> Chức năng nhập xuất kho</Tooltip>,
+    'expImp',
+    <PieChartOutlined />,
+    [
+      getItem(<Tooltip placement="right" title="Báo cáo Nhập kho" arrowPointAtCenter> Báo cáo Nhập kho</Tooltip>, 'Rimport', <ImportOutlined />),
+      getItem(<Tooltip placement="right" title="Báo cáo Xuất kho" arrowPointAtCenter>Báo cáo Xuất kho</Tooltip>, 'Rexport', <ExportOutlined />)
+    ]
+  ),
+  getItem(
+    <Tooltip placement="right" title="Chức năng nhập xuất kho" arrowPointAtCenter>
+      Báo cáo xuất nhập kho
+    </Tooltip>
+    , 'sub1', <UserOutlined />, [
+    getItem('Nhập kho', 'import', <ImportOutlined />),
+    getItem('Xuất kho', 'export', <ExportOutlined />),
+  ]),
+
+];
+
+const Navbar = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const [title,setTitle]=useState('Dashboard')
+  return (
+    <Layout
+      style={{
+        minHeight: '100vh',
+      }}
+    >
+      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+        <div className="logo">
+          {!collapsed && <img src={Img} alt="Hình banner" className='logoThaco' />}
+        </div>
+        <Menu
+          theme="dark"
+          defaultSelectedKeys={['1']}
+          mode="inline"
+          items={items}
+          onClick={e=>{
+            const {innerText} = e.domEvent.target
+            console.log(innerText)}}
+        />
+      </Sider>
+      <Layout className="site-layout">
+        <Header
           
-          </div>
-          <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
-        </Sider>
-        <Layout className="site-layout">
-          <Header
+          className="site-layout-background"
+          style={{
+            padding: 0,
+          }}
+        />
+        <Content
+          style={{
+            margin: '0 16px',
+          }}
+        >
+          <Breadcrumb
+            style={{
+              margin: '16px 0',
+            }}
+          >
+            <Breadcrumb.Item>User</Breadcrumb.Item>
+            <Breadcrumb.Item>Bill</Breadcrumb.Item>
+          </Breadcrumb>
+          <div
             className="site-layout-background"
             style={{
-              padding: 0,
-            }}
-          />
-          <Content
-            style={{
-              margin: '0 16px',
+              padding: 24,
+              minHeight: 360,
             }}
           >
-            <Breadcrumb
-              style={{
-                margin: '16px 0',
-              }}
-            >
-              <Breadcrumb.Item>User</Breadcrumb.Item>
-              <Breadcrumb.Item>Bill</Breadcrumb.Item>
-            </Breadcrumb>
-            <div
-              className="site-layout-background"
-              style={{
-                padding: 24,
-                minHeight: 360,
-              }}
-            >
-              Bill is a cat.
-            </div>
-          </Content>
-          <Footer
-            style={{
-              textAlign: 'center',
-            }}
-          >
-            make by Trần Lê Quốc Bảo - Antd support
-          </Footer>
-        </Layout>
+            Bill is a cat.
+          </div>
+        </Content>
+        <Footer
+          style={{
+            textAlign: 'center',
+          }}
+        >
+          make by Trần Lê Quốc Bảo - Antd support
+        </Footer>
       </Layout>
-    );
-  };
-  
-  export default Navbar;
+    </Layout>
+  );
+};
+
+export default Navbar;
