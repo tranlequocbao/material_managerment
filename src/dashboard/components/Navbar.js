@@ -9,7 +9,9 @@ import {
 } from '@ant-design/icons';
 
 import { Breadcrumb, Tooltip, Layout, Menu } from 'antd';
-
+import Exist from './Exist';
+import Import from './Import';
+import Export from './Export';
 import React, { useState } from 'react';
 import '../Styles/Dashboard.css'
 import Img from "../../Assets/to_readme/Logobg.png"
@@ -52,7 +54,14 @@ const items = [
 
 const Navbar = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [title,setTitle]=useState('Dashboard')
+  const [page,setPage]=useState('exist')
+  const [title,setTitle]=useState(page)
+  const components={
+    'exist':<Exist/>,
+    'import':<Import/>,
+    'export':<Export/>
+  }
+  console.log(components['exist'])
   return (
     <Layout
       style={{
@@ -70,7 +79,11 @@ const Navbar = () => {
           items={items}
           onClick={e=>{
             const {innerText} = e.domEvent.target
-            console.log(innerText)}}
+            
+            setPage(e.key)
+            setTitle(innerText)
+            }}
+            
         />
       </Sider>
       <Layout className="site-layout">
@@ -80,7 +93,10 @@ const Navbar = () => {
           style={{
             padding: 0,
           }}
-        />
+          
+        >
+          <div className='title'>{title}</div>
+        </Header>
         <Content
           style={{
             margin: '0 16px',
@@ -101,7 +117,7 @@ const Navbar = () => {
               minHeight: 360,
             }}
           >
-            Bill is a cat.
+            {components[page]}
           </div>
         </Content>
         <Footer
