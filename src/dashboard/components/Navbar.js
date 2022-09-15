@@ -33,7 +33,7 @@ const items = [
     <PieChartOutlined />
   ),
   getItem(
-    <Tooltip placement="right" title="Chức năng nhập xuất kho" arrowPointAtCenter> Chức năng nhập xuất kho</Tooltip>,
+    <Tooltip placement="right" title="Báo cáo nhập xuất kho" arrowPointAtCenter> Báo cáo nhập xuất kho</Tooltip>,
     'expImp',
     <PieChartOutlined />,
     [
@@ -43,7 +43,7 @@ const items = [
   ),
   getItem(
     <Tooltip placement="right" title="Chức năng nhập xuất kho" arrowPointAtCenter>
-      Báo cáo xuất nhập kho
+      Chức năng nhập xuất kho
     </Tooltip>
     , 'sub1', <UserOutlined />, [
     getItem('Nhập kho', 'import', <ImportOutlined />),
