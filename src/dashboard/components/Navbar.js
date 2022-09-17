@@ -61,7 +61,7 @@ const Navbar = () => {
     'import':<Import/>,
     'export':<Export/>
   }
-  console.log(components['exist'])
+  //console.log(components['exist'])
   return (
     <Layout
       style={{
@@ -107,8 +107,8 @@ const Navbar = () => {
               margin: '16px 0',
             }}
           >
-            <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item>
+            {/* <Breadcrumb.Item>User</Breadcrumb.Item>
+            <Breadcrumb.Item>Bill</Breadcrumb.Item> */}
           </Breadcrumb>
           <div
             className="site-layout-background"
