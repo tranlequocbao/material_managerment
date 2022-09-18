@@ -12,9 +12,10 @@ import { Breadcrumb, Tooltip, Layout, Menu } from 'antd';
 import Exist from './Exist';
 import Import from './Import';
 import Export from './Export';
-import React, { useState } from 'react';
+import React, { useState,useRef,useLayoutEffect } from 'react';
 import '../Styles/Dashboard.css'
 import Img from "../../Assets/to_readme/Logobg.png"
+
 const { Header, Content, Footer, Sider } = Layout;
 
 function getItem(label, key, icon, children) {
@@ -53,9 +54,27 @@ const items = [
 ];
 
 const Navbar = () => {
+  //get width of window
+  const targetRef = useRef();
+
+
+
   const [collapsed, setCollapsed] = useState(false);
   const [page,setPage]=useState('exist')
   const [title,setTitle]=useState(page)
+  useLayoutEffect(() => {
+    
+    if (targetRef.current) {
+     
+      setResponsive(targetRef.current.offsetWidth)
+      
+    }
+  }, []);
+
+  const setResponsive=(witdh)=>{
+    witdh<=760?setCollapsed(true):setCollapsed(false)
+ 
+  }
   const components={
     'exist':<Exist/>,
     'import':<Import/>,
@@ -67,6 +86,7 @@ const Navbar = () => {
       style={{
         minHeight: '100vh',
       }}
+      ref={targetRef}
     >
       <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
         <div className="logo">

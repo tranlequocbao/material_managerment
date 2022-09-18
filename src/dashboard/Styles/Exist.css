@@ -1,0 +1,30 @@
+.card-body{
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px !important;
+}
+.card{
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px !important;
+}
+.icons{
+    width: 100%;
+    font-size: 50px;
+    position: absolute;
+    top: 0px;
+    left: 12px; 
+}
+.exist{
+    background: rgb(2,0,36);
+background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(11,9,121,1) 25%, rgba(0,212,255,1) 100%);
+}
+.import{
+    background: rgb(2,0,36);
+background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,121,71,1) 25%, rgba(0,212,255,1) 100%);
+}
+.export{
+    background: rgb(2,0,36);
+    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(99,11,198,1) 29%, rgba(0,212,255,1) 100%);
+}
+.chart{
+    justify-content: space-between;
+}
