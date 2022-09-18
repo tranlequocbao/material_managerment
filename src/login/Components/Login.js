@@ -12,6 +12,7 @@ export default function Login() {
     function importAll(r) {
         return r.keys().map(r);
     }
+    localStorage.setItem('msnv','1806204')
     const openNotification = () => {
         const args = {
           message: 'Notification Title',
