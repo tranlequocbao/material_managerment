@@ -71,7 +71,7 @@ function Exist() {
   };
   return (
     <div >
-      <Container bg='light'>
+      <Container fluid bg='light'>
         <Row xs={1} md={3} className="cardDash g-4 mb-5">
           {/* Tồn kho */}
           <Col>
@@ -83,19 +83,16 @@ function Exist() {
             >
               <Card.Header>
                 <Card.Body className='d-flex'>
-                  <Card.Title className='m-1'>
-                    <div className='icons'>
-                      <BsFillBarChartFill />
-                    </div>
-                  </Card.Title>
                   <Card.Title className='mb-0'>
-                    Tồn kho
+                    SỐ LƯỢNG TỒN KHO
                   </Card.Title>
                 </Card.Body>
               </Card.Header>
               <Card.Body className='d-flex'>
-                <Card.Title className='m-1'>Số lượng</Card.Title>
-                <Card.Title className='mb-0'>
+                <Card.Title className='m-1'> <div className='icons'>
+                      <BsFillBarChartFill />
+                    </div></Card.Title>
+                <Card.Title className='mb-0' style={{fontSize:'25px'}}>
                   1806204
                 </Card.Title>
               </Card.Body>
@@ -112,19 +109,16 @@ function Exist() {
             >
               <Card.Header>
                 <Card.Body className='d-flex'>
-                  <Card.Title className='m-1'>
-                    <div className='icons'>
-                      <BsBoxArrowInLeft />
-                    </div>
-                  </Card.Title>
                   <Card.Title className='mb-0'>
-                    Nhập kho
+                   NHẬP KHO THEO NGÀY
                   </Card.Title>
                 </Card.Body>
               </Card.Header>
               <Card.Body className='d-flex'>
-                <Card.Title className='m-1'>Theo ngày</Card.Title>
-                <Card.Title className='mb-0'>
+                <Card.Title className='m-1'> <div className='icons'>
+                      <BsBoxArrowInLeft />
+                    </div></Card.Title>
+                <Card.Title className='mb-0' style={{fontSize:'25px'}}>
                   1806204
                 </Card.Title>
               </Card.Body>
@@ -141,19 +135,17 @@ function Exist() {
             >
               <Card.Header>
                 <Card.Body className='d-flex'>
-                  <Card.Title className='m-1'>
-                    <div className='icons'>
-                      <BsBoxArrowRight />
-                    </div>
-                  </Card.Title>
-                  <Card.Title className='mb-0'>
-                    Xuất kho
+                
+                  <Card.Title className='mb-0' >
+                    XUẤT KHO THEO NGÀY
                   </Card.Title>
                 </Card.Body>
               </Card.Header>
               <Card.Body className='d-flex'>
-                <Card.Title className='m-1'>Theo ngày</Card.Title>
-                <Card.Title className='mb-0'>
+                <Card.Title className='m-1'> <div className='icons'>
+                      <BsBoxArrowRight />
+                    </div></Card.Title>
+                <Card.Title className='mb-0' style={{fontSize:'25px'}}>
                   1806204
                 </Card.Title>
               </Card.Body>
@@ -162,10 +154,10 @@ function Exist() {
           </Col>
         </Row>
         <Row className='chart'>
-          <Col md='5'>
+          <Col md='4'>
             <Pie data={data}/> 
           </Col>
-          <Col md='5'>
+          <Col md='8'>
           <Line options={options} data={dataLine} />
           </Col>
         </Row>
