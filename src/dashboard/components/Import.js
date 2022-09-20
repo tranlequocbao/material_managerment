@@ -34,10 +34,9 @@ function Import() {
     validationSchema: Yup.object({
       id: Yup.string().required('Vui lòng nhập mã vật tư'),
       name: Yup.string().required('Tên vật tư không để trống'),
-      amount: Yup.number().required('Nhập số lượng vào dùm')
-    }),
+      amount: Yup.number().required('Nhập số lượng vào dùm').min(2, 'Vui lòng nhập trên 2 chữ số'),
+        }),
     onSubmit: (values, { resetForm }) => {
-      console.log('aa')
       handleSubmit(values, { resetForm })
     }
   })
@@ -71,7 +70,7 @@ function Import() {
     formik.values['unit'] = unit;
     
     let data = formik.values
-    console.log(data)
+
     if (status == 'insert') {
       axios.post('http://113.174.246.52:8082/api/import_materialManagerment', {
         data: data
@@ -88,7 +87,19 @@ function Import() {
       })
     }
     else if (status == 'update') {
+      axios.post('http://113.174.246.52:8082/api/update_materialManagerment', {
+        data: data
+      }).then((response) => {
+        if (response.data['errno']) {
+          openNotification("CẬP NHẬT LIỆU THẤT BẠI", 'error',)
+        }
+        else {
+          openNotification("CẬP NHẬT LIỆU THÀNH CÔNG", 'success',)
+          setImg('')
+          resetForm({ values: '' })
 
+        }
+      })
     }
     
 
@@ -122,6 +133,7 @@ function Import() {
           formik.setFieldValue('otherName', data.other_name)
           formik.setFieldValue('supplier', data.supplier)
           data.img && setImg(data.img)
+          setStatus('update')
         }
       })
     }
@@ -177,6 +189,7 @@ function Import() {
               value={formik.values.name}
               onChange={formik.handleChange}
               label='Nhập tên vật tư' type='text' size='lg' />
+               {formik.errors.name && (<p className='error'>{formik.errors.name}</p>)}
           </MDBCol>
           <MDBCol size='md-2'>
             <div className='unit'>
@@ -240,6 +253,7 @@ function Import() {
               id='dept'
               name='dept'
               value={formik.values.dept}
+              onChange={formik.handleChange}
               label='Xưởng' type='text' size='lg' />
           </MDBCol>
         </MDBRow>
@@ -251,6 +265,7 @@ function Import() {
               value={formik.values.amount}
               onChange={formik.handleChange}
               label='Số lượng' type='text' size='lg' />
+               {formik.errors.amount && (<p className='error'>{formik.errors.amount}</p>)}
           </MDBCol>
           <MDBCol size='md-2'>
             <MDBInput
