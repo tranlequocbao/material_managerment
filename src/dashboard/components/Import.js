@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react';
 import axios from 'axios';
-import { MDBInput, MDBContainer, MDBRow, MDBCol, MDBInputGroup, MDBBtn } from 'mdb-react-ui-kit';
+import { MDBInput, MDBContainer, MDBRow, MDBCol, MDBBtn } from 'mdb-react-ui-kit';
 import { Select, notification } from 'antd';
 import 'antd/dist/antd.css';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css'
@@ -11,6 +11,7 @@ import * as Yup from 'yup'
 function Import() {
   const { Option } = Select;
   const [img, setImg] = useState('')
+  const [imgUpload, setImgUpload] = useState('')
   const [unit, setUnit] = useState("Bộ")
   const [status, setStatus] = useState('insert')
   const initData = {
@@ -36,6 +37,7 @@ function Import() {
       amount: Yup.number().required('Nhập số lượng vào dùm')
     }),
     onSubmit: (values, { resetForm }) => {
+      console.log('aa')
       handleSubmit(values, { resetForm })
     }
   })
@@ -51,16 +53,27 @@ function Import() {
 
 
 
+  function getBase64(file, cb) {
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function () {
+      cb(reader.result)
+    };
+    reader.onerror = function (error) {
+      console.log('Error: ', error);
+    };
+  }
+  //console.log(img)
   //submit vào csld
   const handleSubmit = (values, { resetForm }) => {
-
+    
+    formik.values['img'] = img;
     formik.values['unit'] = unit;
-    if (img)
-      formik.values['img'] = img.preview;
-
+    
     let data = formik.values
+    console.log(data)
     if (status == 'insert') {
-      axios.post('http://10.40.12.4:3001/api/import_materialManagerment', {
+      axios.post('http://113.174.246.52:8082/api/import_materialManagerment', {
         data: data
       }).then((response) => {
         if (response.data['errno']) {
@@ -77,7 +90,7 @@ function Import() {
     else if (status == 'update') {
 
     }
-
+    
 
 
   }
@@ -89,27 +102,26 @@ function Import() {
 
   //load thông tin nếu mã id đã tồn tại
   const handleLoadId = () => {
-    if(formik.values.id!=''){
-      axios.post('http://10.40.12.4:3001/api/returnInfoID_materialManagerment', {
+    if (formik.values.id != '') {
+      axios.post('http://113.174.246.52:8082/api/returnInfoID_materialManagerment', {
         id: formik.values.id
       }).then((response) => {
-        
+
         const data = response.data[0]
-        
-        if(data){
+
+        if (data) {
           console.log(data)
-          formik.setFieldValue('name',data.name)
+          formik.setFieldValue('name', data.name)
           setUnit(data.unit)
-          formik.setFieldValue('amount',data.amount)
-          formik.setFieldValue('initPrice',data.unit_price)
-          formik.setFieldValue('idType',data.id_type)
-          formik.setFieldValue('device',data.device)
-          formik.setFieldValue('group',data.groups_material)
-          formik.setFieldValue('dept',data.dept)
-          formik.setFieldValue('otherName',data.other_name)
-          formik.setFieldValue('supplier',data.supplier)
-          data.img &&setImg(data.img)
-          console.log(img)
+          formik.setFieldValue('amount', data.amount)
+          formik.setFieldValue('initPrice', data.unit_price)
+          formik.setFieldValue('idType', data.id_type)
+          formik.setFieldValue('device', data.device)
+          formik.setFieldValue('group', data.groups_material)
+          formik.setFieldValue('dept', data.dept)
+          formik.setFieldValue('otherName', data.other_name)
+          formik.setFieldValue('supplier', data.supplier)
+          data.img && setImg(data.img)
         }
       })
     }
@@ -118,12 +130,25 @@ function Import() {
 
   //load hình cho vật tư
   const handleUpload = (e) => {
-
+     
     if (e.target.files.length != 0) {
       const file = e.target.files[0];
-      console.log(file)
-      file.preview = URL.createObjectURL(file)
-      setImg(file)
+      let myPromise = new Promise(function(rev){
+        getBase64(file, (result) => {
+          rev(result);
+        });
+       })
+  
+       myPromise.then(
+        function(value){
+          setImg(value)
+        }
+       )
+      // const file = e.target.files[0];
+      // setImgUpload(file)
+      // file.preview = URL.createObjectURL(file)
+      // setImg(file)
+
     }
     else setImg('')
 
@@ -251,7 +276,7 @@ function Import() {
           <MDBCol size='md-12'>
             <div className='d-flex justify-content-center' >
               <div className='img' style={{ width: '50%', height: '50%' }}>
-                <img src={img ? (img.preview) : ''} alt='' className='img-fluid shadow-2-strong' />
+                <img src={img ? (img) : ''} alt='' className='img-fluid shadow-2-strong' />
               </div>
             </div>
           </MDBCol>
@@ -261,7 +286,7 @@ function Import() {
             <div className='d-flex justify-content-center' >
               <MDBBtn rounded type='submit' className='mx-2' color='primary'
 
-              //onClick={formik.handleSubmit} 
+              onClick={formik.handleSubmit} 
               >
                 NHẬP KHO
               </MDBBtn>

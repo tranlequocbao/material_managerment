@@ -12,7 +12,7 @@ export default function Login() {
     function importAll(r) {
         return r.keys().map(r);
     }
-    localStorage.setItem('msnv','1806204')
+    
     const openNotification = () => {
         const args = {
           message: 'Notification Title',
@@ -22,7 +22,7 @@ export default function Login() {
         notification.open(args);
       };
     const handleLongin=(values)=>{
-        axios.post("http://10.40.12.4:3001/api/getLogin_materialManagerment",{
+        axios.post("http://113.174.246.52:8082/api/getLogin_materialManagerment",{
             msnv:values.msnv,
             pass:values.pass
         }).then((response)=>{
