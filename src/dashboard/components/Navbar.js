@@ -15,6 +15,7 @@ import Exist from './Exist';
 import Import from './Import';
 import Export from './Export';
 import React, { useState, useRef, useLayoutEffect } from 'react';
+
 import '../Styles/Dashboard.css'
 
 
@@ -163,7 +164,7 @@ const Navbar = () => {
             textAlign: 'center',
           }}
         >
-          make by Trần Lê Quốc Bảo - Antd support
+          Made by GIẢI PHÁP ỨNG DỤNG Team 
         </Footer>
       </Layout>
     </Layout>

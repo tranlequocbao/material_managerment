@@ -1,25 +1,84 @@
-import React from 'react'
-import { Container, Row, Col, Card, CardGroup } from 'react-bootstrap'
+import React, { useState } from 'react'
+import { Container, Row, Col, Card, CardGroup, Button } from 'react-bootstrap'
 import { BsFillBarChartFill, BsBoxArrowInLeft, BsBoxArrowRight } from 'react-icons/bs';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../Styles/Exist.css'
-import { Chart as ChartJS, ArcElement, Tooltip, Legend,CategoryScale,
+import {
+  Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
-  Title } from 'chart.js';
+  Title
+} from 'chart.js';
+import { downloadExcel } from 'react-export-table-to-excel';
 import { Pie } from 'react-chartjs-2';
 import { Line } from 'react-chartjs-2';
 import faker from 'faker';
+import TableAnt from './table/Table';
+import axios from 'axios';
+import { columns } from './table/Table';
+
+const header = []
+const body = []
+const exist=0;
 function Exist() {
-  ChartJS.register(ArcElement, Tooltip, Legend,CategoryScale,
+
+  //const dataTable=
+  const [dataTable, setDataTable] = React.useState([])
+  const [exist,setExist]=useState(0)
+
+  React.useEffect(() => {
+    getData()
+
+  }, [])
+
+  async function getData() {
+    const response = await axios.post('http://113.174.246.52:8082/api/returnAll_materialManagerment')
+    let database = await response.data
+    const database1 = []
+    database.map((val, index) => {
+      database1.push(
+        {
+          key: index,
+          ...val
+        }
+      )
+      delete val['img']
+      body.push(
+        val
+      )
+      setExist(exist=>exist+1)
+    })
+    setDataTable(database1)
+
+    columns.map((val, index) =>
+      header.push(val.title)
+    )
+    console.log(header)
+  }
+
+
+  //function export Excel
+  function handleDownloadExcel() {
+    downloadExcel({
+      fileName: "react-export-table-to-excel -> downloadExcel method",
+      sheet: "react-export-table-to-excel",
+      tablePayload: {
+        header,
+        // accept two different data structures
+        body: body
+      },
+    });
+  }
+
+  ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale,
     LinearScale,
     PointElement,
     LineElement,
     Title,
-    
-    );
-//chart pie
+
+  );
+  //chart pie
   const data = {
     labels: ['Trống', 'Đã có'],
     datasets: [
@@ -43,7 +102,7 @@ function Exist() {
     responsive: true,
     plugins: {
       legend: {
-        position: 'top' ,
+        position: 'top',
       },
       title: {
         display: true,
@@ -90,10 +149,10 @@ function Exist() {
               </Card.Header>
               <Card.Body className='d-flex'>
                 <Card.Title className='m-1'> <div className='icons'>
-                      <BsFillBarChartFill />
-                    </div></Card.Title>
-                <Card.Title className='mb-0' style={{fontSize:'25px'}}>
-                  1806204
+                  <BsFillBarChartFill />
+                </div></Card.Title>
+                <Card.Title className='mb-0' style={{ fontSize: '25px' }}>
+                  {exist!=0&&exist}
                 </Card.Title>
               </Card.Body>
 
@@ -110,16 +169,16 @@ function Exist() {
               <Card.Header>
                 <Card.Body className='d-flex'>
                   <Card.Title className='mb-0'>
-                   NHẬP KHO THEO NGÀY
+                    NHẬP KHO THEO NGÀY
                   </Card.Title>
                 </Card.Body>
               </Card.Header>
               <Card.Body className='d-flex'>
                 <Card.Title className='m-1'> <div className='icons'>
-                      <BsBoxArrowInLeft />
-                    </div></Card.Title>
-                <Card.Title className='mb-0' style={{fontSize:'25px'}}>
-                  1806204
+                  <BsBoxArrowInLeft />
+                </div></Card.Title>
+                <Card.Title className='mb-0' style={{ fontSize: '25px' }}>
+                  05
                 </Card.Title>
               </Card.Body>
 
@@ -135,7 +194,7 @@ function Exist() {
             >
               <Card.Header>
                 <Card.Body className='d-flex'>
-                
+
                   <Card.Title className='mb-0' >
                     XUẤT KHO THEO NGÀY
                   </Card.Title>
@@ -143,10 +202,10 @@ function Exist() {
               </Card.Header>
               <Card.Body className='d-flex'>
                 <Card.Title className='m-1'> <div className='icons'>
-                      <BsBoxArrowRight />
-                    </div></Card.Title>
-                <Card.Title className='mb-0' style={{fontSize:'25px'}}>
-                  1806204
+                  <BsBoxArrowRight />
+                </div></Card.Title>
+                <Card.Title className='mb-0' style={{ fontSize: '25px' }}>
+                  00
                 </Card.Title>
               </Card.Body>
 
@@ -155,11 +214,30 @@ function Exist() {
         </Row>
         <Row className='chart'>
           <Col md='4'>
-            <Pie data={data}/> 
+            <Pie data={data} />
           </Col>
           <Col md='8'>
-          <Line options={options} data={dataLine} />
+            <Line options={options} data={dataLine} />
           </Col>
+        </Row>
+        <Row>
+          <Row className='titleTable text-center mt-5'>
+            <Col className='groupTitle'>
+              <div>
+                <h2></h2>
+              </div>
+              <div>
+                <h2>BẢNG TỒN KHO</h2>
+              </div>
+              <div>
+                <Button onClick={handleDownloadExcel}>export</Button>
+              </div>
+            </Col>
+
+
+          </Row>
+
+          <TableAnt value={dataTable} />
         </Row>
       </Container>
     </div>

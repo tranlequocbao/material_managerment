@@ -68,7 +68,8 @@ export default function Login() {
             <Col span={20} offset={2}>
                 <div className="body">
                     <div className="left-login">
-                    <h1>ỨNG DỤNG QUẢN LÝ KHO VẬT TƯ BẢO TRÌ</h1>
+                    <div className='titleLogin' style={{textAlign: 'center', marginTop:'20px'}}> <h1>ỨNG DỤNG QUẢN LÝ KHO VẬT TƯ BẢO TRÌ</h1></div>
+                   
                         <Row>
                             <Col span={24} xl={14} className="imgBanner">
                                 {/* <img src={Img} alt="Hình minh hoạ" className="banner" /> */}

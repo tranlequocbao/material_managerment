@@ -54,6 +54,13 @@
 .logout:hover::before {
   width: 100%;
 }
+.groupTitle{
+  display: inline-flex;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
 @media only screen and (max-width: 600px) {
  .title{
   display: none;
