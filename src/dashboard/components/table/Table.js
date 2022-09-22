@@ -190,7 +190,7 @@ function TableAnt(props) {
 
       
     ];
-    return <Table columns={columns} dataSource={props.value} />;
+    return <Table columns={columns} dataSource={props.value} scroll={{ x: 'calc(700px + 50%)', y: 500 }} />;
 }
 
 export default TableAnt

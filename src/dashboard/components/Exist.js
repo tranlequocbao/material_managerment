@@ -18,8 +18,8 @@ import TableAnt from './table/Table';
 import axios from 'axios';
 import { columns } from './table/Table';
 
-const header = []
-const body = []
+var header = []
+var body = []
 const exist=0;
 function Exist() {
 
@@ -28,6 +28,8 @@ function Exist() {
   const [exist,setExist]=useState(0)
 
   React.useEffect(() => {
+    header=[]
+    body=[]
     getData()
 
   }, [])
@@ -61,8 +63,8 @@ function Exist() {
   //function export Excel
   function handleDownloadExcel() {
     downloadExcel({
-      fileName: "react-export-table-to-excel -> downloadExcel method",
-      sheet: "react-export-table-to-excel",
+      fileName: "bc tonkho"+Date(),
+      sheet: "ketqua",
       tablePayload: {
         header,
         // accept two different data structures

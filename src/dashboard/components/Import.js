@@ -121,11 +121,11 @@ function Import() {
         const data = response.data[0]
 
         if (data) {
-          console.log(data)
+          
           formik.setFieldValue('name', data.name)
           setUnit(data.unit)
           formik.setFieldValue('amount', data.amount)
-          formik.setFieldValue('initPrice', data.unit_price)
+          formik.setFieldValue('unitPrice', data.unit_price)
           formik.setFieldValue('idType', data.id_type)
           formik.setFieldValue('device', data.device)
           formik.setFieldValue('group', data.groups_material)

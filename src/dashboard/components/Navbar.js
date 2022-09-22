@@ -7,13 +7,14 @@ import {
   ExportOutlined,
   ImportOutlined,
   LogoutOutlined,
-  DingtalkOutlined
+  DatabaseOutlined
 } from '@ant-design/icons';
 import Img from "../../Assets/to_readme/Logobg.png"
 import { Breadcrumb, Tooltip, Layout, Menu, Button } from 'antd';
 import Exist from './Exist';
 import Import from './Import';
 import Export from './Export';
+import Layouts from './Layout'
 import React, { useState, useRef, useLayoutEffect } from 'react';
 
 import '../Styles/Dashboard.css'
@@ -53,6 +54,11 @@ const items = [
     getItem('Nhập kho', 'import', <ImportOutlined />),
     getItem('Xuất kho', 'export', <ExportOutlined />),
   ]),
+  getItem(
+    <Tooltip placement="right" title="Vị trí tại kho" arrowPointAtCenter>Khai báo vị trí</Tooltip>,
+    'layout',
+    <DatabaseOutlined />
+  ),
 
 ];
 
@@ -78,7 +84,8 @@ const Navbar = () => {
   const components = {
     'exist': <Exist />,
     'import': <Import />,
-    'export': <Export />
+    'export': <Export />,
+    'layout': <Layouts />
   }
   //console.log(components['exist'])
   return (
