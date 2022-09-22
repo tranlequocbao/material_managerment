@@ -28,15 +28,12 @@ function Layouts() {
         axios.post('http://113.174.246.52:8082/api/returnInfoLayout_materialManagerment')
             .then((res) => {
                 const database = res.data
-                if(data===database){
-                    console.log(data)
+                const sameArray = JSON.stringify(database) === JSON.stringify(data);
+                if(sameArray==false){
                     console.log(database)
-                   
-                }
-                else{
                     setData(database)
                 }
-            
+                
                 
             }
             )

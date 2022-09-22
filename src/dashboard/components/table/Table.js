@@ -187,6 +187,14 @@ function TableAnt(props) {
         sorter: (a, b) => a.supplier.length - b.supplier.length,
         sortDirections: ['descend', 'ascend'],
       },
+      {
+        title: 'Vị trí',
+        dataIndex: 'position',
+        key: 'address',
+        ...getColumnSearchProps('position'),
+        sorter: (a, b) => a.position.length - b.position.length,
+        sortDirections: ['descend', 'ascend'],
+      },
 
       
     ];

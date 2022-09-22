@@ -13,6 +13,8 @@ function Import() {
   const [img, setImg] = useState('')
   const [imgUpload, setImgUpload] = useState('')
   const [unit, setUnit] = useState("Bộ")
+  const [positions, setPositions] = useState('')
+  const [position, setPosition] = useState('')
   const [status, setStatus] = useState('insert')
   const initData = {
     id: '',
@@ -26,7 +28,8 @@ function Import() {
     group: '',
     dept: '',
     supplier: '',
-    img: ''
+    img: '',
+    position: '',
   }
   //Khơi tạo biến formik
   const formik = useFormik({
@@ -34,8 +37,8 @@ function Import() {
     validationSchema: Yup.object({
       id: Yup.string().required('Vui lòng nhập mã vật tư'),
       name: Yup.string().required('Tên vật tư không để trống'),
-      amount: Yup.number().required('Nhập số lượng vào dùm').min(2, 'Vui lòng nhập trên 2 chữ số'),
-        }),
+      amount: Yup.number().required('Nhập số lượng vào dùm').min(2, 'Vui lòng nhập trên 2 chữ số'),  
+    }),
     onSubmit: (values, { resetForm }) => {
       handleSubmit(values, { resetForm })
     }
@@ -64,11 +67,14 @@ function Import() {
   }
   //console.log(img)
   //submit vào csld
+
+
   const handleSubmit = (values, { resetForm }) => {
-    
+
     formik.values['img'] = img;
     formik.values['unit'] = unit;
-    
+    formik.values['position']=position;
+    formik.values['user']=JSON.parse(localStorage.getItem('user'))
     let data = formik.values
 
     if (status == 'insert') {
@@ -101,7 +107,7 @@ function Import() {
         }
       })
     }
-    
+
 
 
   }
@@ -109,8 +115,22 @@ function Import() {
   const handleSelect = (values) => {
     setUnit(values)
   }
-
-
+  //get value select position
+  const handleSelectPosition = (values) => {
+    console.log(values)
+  }
+  //load vị trí rỗng
+  React.useEffect(() => {
+    getData()
+  }, [])
+  function getData() {
+    axios.post('http://113.174.246.52:8082/api/returnLayoutEmpty_materialManagerment')
+      .then((res) => {
+        console.log(res.data)
+        setPositions(res.data)
+        setPosition(res.data[0].id)
+      })
+  }
   //load thông tin nếu mã id đã tồn tại
   const handleLoadId = () => {
     if (formik.values.id != '') {
@@ -121,7 +141,7 @@ function Import() {
         const data = response.data[0]
 
         if (data) {
-          
+
           formik.setFieldValue('name', data.name)
           setUnit(data.unit)
           formik.setFieldValue('amount', data.amount)
@@ -133,7 +153,10 @@ function Import() {
           formik.setFieldValue('otherName', data.other_name)
           formik.setFieldValue('supplier', data.supplier)
           data.img && setImg(data.img)
+          setPosition(data.position)
+          setPositions([{id:data.postion}])
           setStatus('update')
+          
         }
       })
     }
@@ -142,20 +165,20 @@ function Import() {
 
   //load hình cho vật tư
   const handleUpload = (e) => {
-     
+
     if (e.target.files.length != 0) {
       const file = e.target.files[0];
-      let myPromise = new Promise(function(rev){
+      let myPromise = new Promise(function (rev) {
         getBase64(file, (result) => {
           rev(result);
         });
-       })
-  
-       myPromise.then(
-        function(value){
+      })
+
+      myPromise.then(
+        function (value) {
           setImg(value)
         }
-       )
+      )
       // const file = e.target.files[0];
       // setImgUpload(file)
       // file.preview = URL.createObjectURL(file)
@@ -189,7 +212,7 @@ function Import() {
               value={formik.values.name}
               onChange={formik.handleChange}
               label='Nhập tên vật tư' type='text' size='lg' />
-               {formik.errors.name && (<p className='error'>{formik.errors.name}</p>)}
+            {formik.errors.name && (<p className='error'>{formik.errors.name}</p>)}
           </MDBCol>
           <MDBCol size='md-2'>
             <div className='unit'>
@@ -207,6 +230,8 @@ function Import() {
                 <Option value="Binh">Bình</Option>
                 <Option value="Bo">Bô</Option>
                 <Option value="cai">Cái</Option>
+                <Option value="day">Dây</Option>
+                <Option value="soi">Sợi</Option>
               </Select>
               }
             </div>
@@ -265,7 +290,7 @@ function Import() {
               value={formik.values.amount}
               onChange={formik.handleChange}
               label='Số lượng' type='text' size='lg' />
-               {formik.errors.amount && (<p className='error'>{formik.errors.amount}</p>)}
+            {formik.errors.amount && (<p className='error'>{formik.errors.amount}</p>)}
           </MDBCol>
           <MDBCol size='md-2'>
             <MDBInput
@@ -282,6 +307,30 @@ function Import() {
 
           </MDBCol>
         </MDBRow>
+        <MDBRow className='mb-3' >
+          <MDBRow className='mb-3' ></MDBRow>
+          <MDBCol size='md-12'>
+            <Select
+              id='position'
+              name='position'
+              value={position}
+              style={{
+                height: '100%',
+                width: '100%'
+              }}
+              onChange={handleSelectPosition}
+            >
+              {
+               
+                
+               positions&&positions.map((val, index) => (
+                  <Option key={val.id}>{val.id}</Option>
+               ))
+              }
+            </Select>
+            {formik.errors.position && (<p className='error'>{formik.errors.position}</p>)}
+          </MDBCol>
+        </MDBRow>
         <MDBRow className='mb-3'>
 
         </MDBRow>
@@ -296,12 +345,12 @@ function Import() {
             </div>
           </MDBCol>
         </MDBRow>
+       
         <MDBRow className='mb-3 ' >
           <MDBCol size='md-12' id='import'>
             <div className='d-flex justify-content-center' >
               <MDBBtn rounded type='submit' className='mx-2' color='primary'
-
-              onClick={formik.handleSubmit} 
+                onClick={formik.handleSubmit}
               >
                 NHẬP KHO
               </MDBBtn>
