@@ -56,7 +56,7 @@ function Exist() {
     columns.map((val, index) =>
       header.push(val.title)
     )
-    console.log(header)
+  
   }
 
 

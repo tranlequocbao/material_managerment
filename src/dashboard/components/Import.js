@@ -11,7 +11,6 @@ import * as Yup from 'yup'
 function Import() {
   const { Option } = Select;
   const [img, setImg] = useState('')
-  const [imgUpload, setImgUpload] = useState('')
   const [unit, setUnit] = useState("Bộ")
   const [positions, setPositions] = useState('')
   const [position, setPosition] = useState('')
@@ -37,7 +36,7 @@ function Import() {
     validationSchema: Yup.object({
       id: Yup.string().required('Vui lòng nhập mã vật tư'),
       name: Yup.string().required('Tên vật tư không để trống'),
-      amount: Yup.number().required('Nhập số lượng vào dùm').min(2, 'Vui lòng nhập trên 2 chữ số'),  
+      amount: Yup.string().required('Nhập số lượng vào dùm').min(2, 'Vui lòng nhập trên 2 chữ số'),
     }),
     onSubmit: (values, { resetForm }) => {
       handleSubmit(values, { resetForm })
@@ -45,7 +44,7 @@ function Import() {
   })
 
 
-  // thông báo 
+  // thông báo
   const openNotification = (status, type) => {
     notification[type]({
       message: 'THÔNG BÁO',
@@ -73,8 +72,13 @@ function Import() {
 
     formik.values['img'] = img;
     formik.values['unit'] = unit;
-    formik.values['position']=position;
-    formik.values['user']=JSON.parse(localStorage.getItem('user'))
+    if (position == '') {
+
+      openNotification('Vui lòng chọn vị trí', 'error')
+      return
+    }
+    formik.values['position'] = position;
+    formik.values['user'] = JSON.parse(localStorage.getItem('user'))
     let data = formik.values
 
     if (status == 'insert') {
@@ -141,7 +145,7 @@ function Import() {
         const data = response.data[0]
 
         if (data) {
-
+          console.log(data)
           formik.setFieldValue('name', data.name)
           setUnit(data.unit)
           formik.setFieldValue('amount', data.amount)
@@ -153,10 +157,15 @@ function Import() {
           formik.setFieldValue('otherName', data.other_name)
           formik.setFieldValue('supplier', data.supplier)
           data.img && setImg(data.img)
-          setPosition(data.position)
-          setPositions([{id:data.postion}])
+          if (data.id_layouyt != 'NULL'){
+            setPosition(data.id_layout)
+            // setPositions([{ id: data.id_layout }])
+          }
+          else{
+            setPosition(positions[0].id)
+          }
           setStatus('update')
-          
+
         }
       })
     }
@@ -192,6 +201,13 @@ function Import() {
 
   return (
     <MDBContainer>
+    <MDBRow className='mb-3'>
+      <MDBCol className='md'>
+        {`Tồn kho: ${formik.values.amount}  `} 
+        
+        {`Vị trí: ${position}`}
+      </MDBCol>
+    </MDBRow>
       <form onSubmit={formik.handleSubmit}>
         <MDBRow className='mb-3'>
           <MDBCol size='md-2'>
@@ -300,39 +316,36 @@ function Import() {
               onChange={formik.handleChange}
               label='Đơn giá' type='text' size='lg' />
           </MDBCol>
-          <MDBCol size='md-8'>
-            <div className='upload'>
-              <input type="file" className="form-control" accept="image/*;capture=camera" onChange={handleUpload} id="customFile" />
-            </div>
-
-          </MDBCol>
-        </MDBRow>
-        <MDBRow className='mb-3' >
-          <MDBRow className='mb-3' ></MDBRow>
-          <MDBCol size='md-12'>
-            <Select
+          <MDBCol size='md-2' className='positionLayout'>
+            <div>Vị trí</div>
+            <div><Select
               id='position'
               name='position'
               value={position}
               style={{
-                height: '100%',
+                height: '42px',
                 width: '100%'
               }}
               onChange={handleSelectPosition}
             >
               {
-               
-                
-               positions&&positions.map((val, index) => (
+                positions && positions.map((val, index) => (
                   <Option key={val.id}>{val.id}</Option>
-               ))
+                ))
               }
-            </Select>
+            </Select></div>
+            
             {formik.errors.position && (<p className='error'>{formik.errors.position}</p>)}
           </MDBCol>
         </MDBRow>
-        <MDBRow className='mb-3'>
+        <MDBRow className='mb-3' >
+        <MDBCol size='md-8'>
+            <div className='upload'>
+              <input type="file" className="form-control" accept="image/*;capture=camera" onChange={handleUpload} id="customFile" />
+            </div>
 
+          </MDBCol>
+          
         </MDBRow>
 
         <MDBRow className='mb-3' >
@@ -345,12 +358,12 @@ function Import() {
             </div>
           </MDBCol>
         </MDBRow>
-       
+
         <MDBRow className='mb-3 ' >
           <MDBCol size='md-12' id='import'>
             <div className='d-flex justify-content-center' >
               <MDBBtn rounded type='submit' className='mx-2' color='primary'
-                onClick={formik.handleSubmit}
+              // onClick={formik.handleSubmit}
               >
                 NHẬP KHO
               </MDBBtn>

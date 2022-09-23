@@ -12,7 +12,7 @@ function Layouts() {
     const [modal, setModal] = useState(false);
     const style = {
         background: 'rgb(19, 99, 223)',
-        padding: '8px 0',
+        
         color: 'white',
         borderRadius: '30px',
         width: 'fit-content',
@@ -20,7 +20,7 @@ function Layouts() {
         padding: '5px',
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         getData()
     }, [data])
 
