@@ -122,6 +122,7 @@ function Import() {
   //get value select position
   const handleSelectPosition = (values) => {
     console.log(values)
+    setPosition(values)
   }
   //load vị trí rỗng
   React.useEffect(() => {
