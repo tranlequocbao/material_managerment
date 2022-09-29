@@ -27,20 +27,16 @@ function Layouts() {
     useEffect(() => {
         getData()
         data && data.map((val, i) => {
-
             if (lenght === i + 1) {
-
                 if (val.id_position === idMaterial) {
                     idMaterial_.push(val.id_material)
                     arrayIDMaterial[`${val.id_position}`] = idMaterial_
-
                 }
                 else {
                     arrayIDMaterial[idMaterial] = idMaterial_
                     idMaterial_ = []
                     idMaterial_.push(val.id_material)
                     arrayIDMaterial[`${val.id_position}`] = idMaterial_
-
                 }
                 return true;
             }
@@ -48,20 +44,16 @@ function Layouts() {
                 idMaterial_.push(val.id_material)
             }
             else {
-
                 arrayIDMaterial[`${idMaterial}`] = idMaterial_
                 idMaterial = val.id_position
                 idMaterial_ = []
                 idMaterial_.push(val.id_material)
-
             }
         }
         )
         delete arrayIDMaterial[0]
         delete arrayIDMaterial[""]
         setArray(arrayIDMaterial)
-     
-
     }, [data])
 
     function getData() {
@@ -70,12 +62,8 @@ function Layouts() {
                 const database = res.data
                 const sameArray = JSON.stringify(database) === JSON.stringify(data);
                 if (sameArray == false) {
-
                     setData(database)
-
                 }
-
-
             }
             )
     }
@@ -137,7 +125,6 @@ function Layouts() {
         for (var key in data) {
             name[data[key]['id_material']] = data[key]['name']
         }
-     
     }
     data&&returnName(data)
     const resultLayout = (data) => {
@@ -149,19 +136,14 @@ function Layouts() {
                     <div className='cell'>
                         <div>Vị trí: {key}</div>
                         {
-
                             returnIdMaterial(data[key])
                         }
-
-
                     </div>
                 </Col>
             )
         }
         return resut
     }
-
-
     return (
         <div>
             <Divider orientation="left">LAYOUT KHO BẢO TRÌ XƯỞNG SƠN</Divider>

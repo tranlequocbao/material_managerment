@@ -243,12 +243,12 @@ function Import() {
                 }}
                 onChange={handleSelect}
               >
-                <Option value="bich">Bịch</Option>
-                <Option value="Binh">Bình</Option>
-                <Option value="Bo">Bô</Option>
-                <Option value="cai">Cái</Option>
-                <Option value="day">Dây</Option>
-                <Option value="soi">Sợi</Option>
+                <Option value="Bịch">Bịch</Option>
+                <Option value="Bình">Bình</Option>
+                <Option value="Bô">Bô</Option>
+                <Option value="Cái">Cái</Option>
+                <Option value="Dây">Dây</Option>
+                <Option value="Sợi">Sợi</Option>
               </Select>
               }
             </div>
@@ -335,8 +335,6 @@ function Import() {
                 ))
               }
             </Select></div>
-            
-            {formik.errors.position && (<p className='error'>{formik.errors.position}</p>)}
           </MDBCol>
         </MDBRow>
         <MDBRow className='mb-3' >
@@ -344,11 +342,8 @@ function Import() {
             <div className='upload'>
               <input type="file" className="form-control" accept="image/*;capture=camera" onChange={handleUpload} id="customFile" />
             </div>
-
           </MDBCol>
-          
         </MDBRow>
-
         <MDBRow className='mb-3' >
           <MDBRow className='mb-3' ></MDBRow>
           <MDBCol size='md-12'>

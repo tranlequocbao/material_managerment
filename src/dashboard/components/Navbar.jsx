@@ -15,7 +15,7 @@ import Exist from './Exist';
 import Import from './Import';
 import Export from './Export';
 import Layouts from './Layout'
-import React, { useState, useRef, useLayoutEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect,createContext } from 'react';
 
 import '../Styles/Dashboard.css'
 
@@ -30,7 +30,7 @@ function getItem(label, key, icon, children) {
     label,
   };
 }
-
+export const UserContext = createContext();
 const items = [
   getItem(
     <Tooltip placement="right" title="Báo cáo tồn kho" arrowPointAtCenter>Báo cáo tồn kho</Tooltip>,
@@ -65,10 +65,8 @@ const items = [
 const Navbar = () => {
   //get width of window
   const targetRef = useRef();
-
-
-
-  const [collapsed, setCollapsed] = useState(false);
+  const [dataMaterial,setDataMaterial]=useState([])
+  const [collapsed, setCollapsed] = useState(false)
   const [page, setPage] = useState('exist')
   const [title, setTitle] = useState("Báo cáo tồn Kho")
   useLayoutEffect(() => {
@@ -87,8 +85,10 @@ const Navbar = () => {
     'export': <Export />,
     'layout': <Layouts />
   }
+  
   //console.log(components['exist'])
   return (
+    <UserContext.Provider value={{dataMaterial,setDataMaterial}}>
     <Layout
       style={{
         minHeight: '100vh',
@@ -175,6 +175,7 @@ const Navbar = () => {
         </Footer>
       </Layout>
     </Layout>
+    </UserContext.Provider>
   );
 };
 
