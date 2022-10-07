@@ -5,7 +5,7 @@ import Highlighter from 'react-highlight-words';
 
 
 var columns=[]
-function TableAnt(props) {
+function TableExport(props) {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
@@ -109,31 +109,31 @@ function TableAnt(props) {
     columns = [
       {
         title: 'Mã vật tư',
-        dataIndex: 'id',
-        key: 'name',
-        width: '5%',
-        ...getColumnSearchProps('id'),
+        dataIndex: 'id_material',
+        key: 'id',
+        width: '10%',
+        ...getColumnSearchProps('id_material'),
       },
       {
         title: 'Tên Hàng',
-        dataIndex: 'name',
-        key: 'age',
+        dataIndex: 'name_material',
+        key: 'name',
         width: '20%',
-        ...getColumnSearchProps('name'),
+        ...getColumnSearchProps('name_material'),
       },
       {
-        title: 'Đơn vị',
-        dataIndex: 'unit',
+        title: 'Người Nhập',
+        dataIndex: 'person_action',
         key: 'address',
-        width: '5%',
-        sorter: (a, b) => a.unit.length - b.unit.length,
+        width: '10%',
+        sorter: (a, b) => a.person_action.length - b.person_action.length,
         sortDirections: ['descend', 'ascend'],
       },
       {
         title: 'Số lượng',
         dataIndex: 'amount',
         key: 'address',
-        width: '5%',
+        width: '10%',
         sorter: (a, b) => a.amount.length - b.amount.length,
         sortDirections: ['descend', 'ascend'],
       },
@@ -141,7 +141,7 @@ function TableAnt(props) {
         title: 'Đơn giá',
         dataIndex: 'unit_price',
         key: 'address',
-        width: '5%',
+        width: '10%',
         sorter: (a, b) => a.unit_price.length - b.unit_price.length,
         sortDirections: ['descend', 'ascend'],
       },
@@ -149,61 +149,25 @@ function TableAnt(props) {
         title: 'Thành tiền',
         dataIndex: 'total_price',
         key: 'address',
-        width: '5%',
+        width: '10%',
         sorter: (a, b) => a.unit_price.length - b.unit_price.length,
         sortDirections: ['descend', 'ascend'],
       },
       {
-        title: 'Tên vật tư',
-        dataIndex: 'other_name',
-        key: 'address',
-        width: '5%',
-        sorter: (a, b) => a.other_name.length - b.other_name.length,
-        sortDirections: ['descend', 'ascend'],
-      },
-      {
-        title: 'Thiết bị',
-        dataIndex: 'device',
-        key: 'address',
-        width: '5%',
-        sorter: (a, b) => a.device.length - b.device.length,
-        sortDirections: ['descend', 'ascend'],
-      },
-      {
-        title: 'Nhóm vật tư',
-        dataIndex: 'groups_material',
-        key: 'address',
-        width: '5%',
-        sorter: (a, b) => a.groups_material.length - b.groups_material.length,
-        sortDirections: ['descend', 'ascend'],
-      },
-      {
-        title: 'Xưởng/Bộ phận',
-        dataIndex: 'dept',
-        key: 'address',
-        width: '5%',
-        sorter: (a, b) => a.dept.length - b.dept.length,
-        sortDirections: ['descend', 'ascend'],
-      },
-      {
-        title: 'NCC',
-        dataIndex: 'supplier',
-        key: 'address',
-        width: '5%',
-        ...getColumnSearchProps('supplier'),
-        //sorter: (a, b) => a.supplier.length - b.supplier.length,
-        //sortDirections: ['descend', 'ascend'],
-        onFilter: (value, record) => {
-          return record.supplier.indexOf(value) === 0;
-        },
-      },
-      {
         title: 'Vị trí',
-        dataIndex: 'id_layout',
+        dataIndex: 'position',
         key: 'address',
-        width: '5%',
-        ...getColumnSearchProps('id_layout'),
-        onFilter: (value, record) => record.id_layout.indexOf(value) === 0, 
+        width: '10%',
+        sorter: (a, b) => a.position.length - b.position.length,
+        sortDirections: ['descend', 'ascend'],
+      },
+      {
+        title: 'Ngày nhập',
+        dataIndex: 'created_at',
+        key: 'address',
+        width: '10%',
+        sorter: (a, b) => a.created_at.length - b.created_at.length,
+        sortDirections: ['descend', 'ascend'],
       },
 
       
@@ -212,9 +176,9 @@ function TableAnt(props) {
     columns={columns} 
     dataSource={props.value} 
     scroll={{ x: 'calc(700px + 50%)', y: 500 }} 
-    pagination={{showSizeChanger:true, pageSizeOptions: ['10', '20', '30','50','100'],defaultPageSize:'10'}}
-    />;
+    pagination={{showSizeChanger:true, pageSizeOptions: ['10', '20', '30','50'],defaultPageSize:'50'}}
+     />;
 }
 
-export default TableAnt
+export default TableExport
 export {columns}

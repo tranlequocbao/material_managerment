@@ -14,10 +14,13 @@ import { Breadcrumb, Tooltip, Layout, Menu, Button } from 'antd';
 import Exist from './Exist';
 import Import from './Import';
 import Export from './Export';
+import ReportExport from './ReportExport';
+import ReportImport from './ReportImport'
 import Layouts from './Layout'
 import React, { useState, useRef, useLayoutEffect,createContext } from 'react';
 
 import '../Styles/Dashboard.css'
+
 
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -38,21 +41,21 @@ const items = [
     <PieChartOutlined />
   ),
   getItem(
-    <Tooltip placement="right" title="Báo cáo nhập xuất kho" arrowPointAtCenter> Báo cáo nhập xuất kho</Tooltip>,
+    <Tooltip placement="right" title="Báo cáo nhập xuất kho" arrowPointAtCenter>Nhập Kho</Tooltip>,
     'expImp',
     <PieChartOutlined />,
     [
-      getItem(<Tooltip placement="right" title="Báo cáo Nhập kho" arrowPointAtCenter> Báo cáo Nhập kho</Tooltip>, 'Rimport', <ImportOutlined />),
-      getItem(<Tooltip placement="right" title="Báo cáo Xuất kho" arrowPointAtCenter>Báo cáo Xuất kho</Tooltip>, 'Rexport', <ExportOutlined />)
+      getItem(<Tooltip placement="right" title="Nhập Kho" arrowPointAtCenter>Nhập kho</Tooltip>, 'import', <ImportOutlined />),
+      getItem(<Tooltip placement="right" title="Báo cáo Nhập kho" arrowPointAtCenter>Báo cáo Nhập kho</Tooltip>, 'reportImport', <ExportOutlined />)
     ]
   ),
   getItem(
-    <Tooltip placement="right" title="Chức năng nhập xuất kho" arrowPointAtCenter>
-      Chức năng nhập xuất kho
+    <Tooltip placement="right" title="Xuất Kho" arrowPointAtCenter>
+      Xuất Kho
     </Tooltip>
     , 'sub1', <UserOutlined />, [
-    getItem('Nhập kho', 'import', <ImportOutlined />),
-    getItem('Xuất kho', 'export', <ExportOutlined />),
+      getItem(<Tooltip placement="right" title="Xuất Kho" arrowPointAtCenter>Xuất kho</Tooltip>, 'export', <ImportOutlined />),
+      getItem(<Tooltip placement="right" title="Báo cáo Xuất kho" arrowPointAtCenter>Báo cáo Xuất kho</Tooltip>, 'reportExport', <ExportOutlined />)
   ]),
   getItem(
     <Tooltip placement="right" title="Vị trí tại kho" arrowPointAtCenter>Khai báo vị trí</Tooltip>,
@@ -66,6 +69,7 @@ const Navbar = () => {
   //get width of window
   const targetRef = useRef();
   const [dataMaterial,setDataMaterial]=useState([])
+  const [dataExIm,setDataExIm]=useState([])
   const [collapsed, setCollapsed] = useState(false)
   const [page, setPage] = useState('exist')
   const [title, setTitle] = useState("Báo cáo tồn Kho")
@@ -83,12 +87,19 @@ const Navbar = () => {
     'exist': <Exist />,
     'import': <Import />,
     'export': <Export />,
-    'layout': <Layouts />
+    'layout': <Layouts />,
+    'reportExport':<ReportExport/>,
+    'reportImport':<ReportImport/>,
   }
   
   //console.log(components['exist'])
   return (
-    <UserContext.Provider value={{dataMaterial,setDataMaterial}}>
+    <UserContext.Provider value={{
+      dataMaterial,
+      setDataMaterial,
+      dataExIm,
+      setDataExIm
+      }}>
     <Layout
       style={{
         minHeight: '100vh',

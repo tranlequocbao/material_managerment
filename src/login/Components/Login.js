@@ -15,7 +15,7 @@ export default function Login() {
     
     const openNotification = () => {
         const args = {
-          message: 'Notification Title',
+          message: 'THÔNG TIN ĐĂNG NHẬP',
           description:'Vui lòng kiểm tra thông tin đăng nhập',
           duration: 2,
         };

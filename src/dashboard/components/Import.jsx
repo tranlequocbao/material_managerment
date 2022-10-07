@@ -1,7 +1,8 @@
 import React from 'react'
 import { useState } from 'react';
+import Barcode from 'react-barcode/lib/react-barcode'
 import axios from 'axios';
-import { MDBInput, MDBContainer, MDBRow, MDBCol, MDBBtn } from 'mdb-react-ui-kit';
+import { MDBInput, MDBContainer, MDBRow, MDBCol, MDBBtn } from 'mdb-react-ui-kit'
 import { Select, notification } from 'antd';
 import 'antd/dist/antd.css';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css'
@@ -15,6 +16,8 @@ function Import() {
   const [positions, setPositions] = useState('')
   const [position, setPosition] = useState('')
   const [status, setStatus] = useState('insert')
+  const [barcode,setBarcode]=useState('')
+  const [totalPrice,setTotalPrice]=useState(0)
   const initData = {
     id: '',
     name: '',
@@ -26,7 +29,7 @@ function Import() {
     device: '',
     group: '',
     dept: '',
-    supplier: '',
+    supplier: '#N/A',
     img: '',
     position: '',
   }
@@ -36,7 +39,9 @@ function Import() {
     validationSchema: Yup.object({
       id: Yup.string().required('Vui lòng nhập mã vật tư'),
       name: Yup.string().required('Tên vật tư không để trống'),
-      amount: Yup.string().required('Nhập số lượng vào dùm').min(2, 'Vui lòng nhập trên 2 chữ số'),
+      amount: Yup.string().required('Nhập số lượng vào dùm'),
+      unitPrice:Yup.string().required('Vui lòng nhập đơn giá'),
+      supplier: Yup.string().required('Nhập nhà cung cấp')
     }),
     onSubmit: (values, { resetForm }) => {
       handleSubmit(values, { resetForm })
@@ -69,7 +74,10 @@ function Import() {
 
 
   const handleSubmit = (values, { resetForm }) => {
-
+    if(formik.values.id===''){
+      openNotification('Kiểm tra lại mã ID','error')
+      return false
+    }
     formik.values['img'] = img;
     formik.values['unit'] = unit;
     if (position == '') {
@@ -80,7 +88,6 @@ function Import() {
     formik.values['position'] = position;
     formik.values['user'] = JSON.parse(localStorage.getItem('user'))
     let data = formik.values
-
     if (status == 'insert') {
       axios.post('http://113.174.246.52:8082/api/import_materialManagerment', {
         data: data
@@ -91,6 +98,7 @@ function Import() {
         else {
           openNotification("THÊM DỮ LIỆU THÀNH CÔNG", 'success',)
           setImg('')
+          setTotalPrice(0)
           resetForm({ values: '' })
 
         }
@@ -107,14 +115,14 @@ function Import() {
           openNotification("CẬP NHẬT LIỆU THÀNH CÔNG", 'success',)
           setImg('')
           resetForm({ values: '' })
-
         }
       })
     }
-
-
-
   }
+  //get thành tiền
+const handleTotalPrice=()=>{
+  setTotalPrice(parseInt(formik.values.amount)*parseInt(formik.values.unitPrice))
+}
   // get value select
   const handleSelect = (values) => {
     setUnit(values)
@@ -131,7 +139,6 @@ function Import() {
   function getData() {
     axios.post('http://113.174.246.52:8082/api/returnLayoutEmpty_materialManagerment')
       .then((res) => {
-        console.log(res.data)
         setPositions(res.data)
         setPosition(res.data[0].id)
       })
@@ -144,19 +151,31 @@ function Import() {
       }).then((response) => {
 
         const data = response.data[0]
-
+        
         if (data) {
-          console.log(data)
+          setBarcode(<Barcode value={data.id} />)
+  
           formik.setFieldValue('name', data.name)
+          
           setUnit(data.unit)
+         
           formik.setFieldValue('amount', data.amount)
+        
+          console.log(data)
+      
           formik.setFieldValue('unitPrice', data.unit_price)
+           
           formik.setFieldValue('idType', data.id_type)
+         
           formik.setFieldValue('device', data.device)
+      
           formik.setFieldValue('group', data.groups_material)
+        
           formik.setFieldValue('dept', data.dept)
+   
           formik.setFieldValue('otherName', data.other_name)
           formik.setFieldValue('supplier', data.supplier)
+        
           data.img && setImg(data.img)
           if (data.id_layouyt != 'NULL'){
             setPosition(data.id_layout)
@@ -166,12 +185,14 @@ function Import() {
             setPosition(positions[0].id)
           }
           setStatus('update')
-
+        
+          setTotalPrice(parseInt(data.amount)*parseInt(data.unit_price))
         }
       })
     }
 
   }
+
 
   //load hình cho vật tư
   const handleUpload = (e) => {
@@ -249,6 +270,7 @@ function Import() {
                 <Option value="Cái">Cái</Option>
                 <Option value="Dây">Dây</Option>
                 <Option value="Sợi">Sợi</Option>
+                <Option value="Kg">Kg</Option>
               </Select>
               }
             </div>
@@ -289,6 +311,7 @@ function Import() {
               value={formik.values.supplier}
               onChange={formik.handleChange}
               label='Nhà cung cấp' type='text' size='lg' />
+              {formik.errors.supplier && (<p className='error'>{formik.errors.supplier}</p>)}
           </MDBCol>
           <MDBCol size='md-6'>
             <MDBInput
@@ -306,16 +329,28 @@ function Import() {
               name='amount'
               value={formik.values.amount}
               onChange={formik.handleChange}
-              label='Số lượng' type='text' size='lg' />
+              label='Số lượng' type='text' size='lg'
+              onBlur={handleTotalPrice} />
             {formik.errors.amount && (<p className='error'>{formik.errors.amount}</p>)}
           </MDBCol>
           <MDBCol size='md-2'>
             <MDBInput
-              id='unitPirce'
+              id='unitPrice'
               name='unitPrice'
               value={formik.values.unitPrice}
               onChange={formik.handleChange}
+              onBlur={handleTotalPrice}
               label='Đơn giá' type='text' size='lg' />
+               {formik.errors.unitPrice && (<p className='error'>{formik.errors.unitPrice}</p>)}
+          </MDBCol>
+          <MDBCol size='md-2'>
+            <MDBInput
+              id='totalPrice'
+              name='totalPrice'
+              value={totalPrice}
+              label='Thành tiền' type='text' size='lg' 
+              disabled={true}
+              />
           </MDBCol>
           <MDBCol size='md-2' className='positionLayout'>
             <div>Vị trí</div>
@@ -368,6 +403,8 @@ function Import() {
           </MDBCol>
         </MDBRow>
       </form>
+
+      {barcode&&<div>{barcode}</div>}
     </MDBContainer>
   )
 }

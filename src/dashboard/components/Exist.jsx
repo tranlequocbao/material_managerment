@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react'
 import { Container, Row, Col, Card, CardGroup, Button } from 'react-bootstrap'
-import { BsFillBarChartFill, BsBoxArrowInLeft, BsBoxArrowRight } from 'react-icons/bs';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { BsFillBarChartFill, BsBoxArrowInLeft, BsBoxArrowRight } from 'react-icons/bs'
+import 'bootstrap/dist/css/bootstrap.min.css'
 import '../Styles/Exist.css'
 import  {UserContext} from './Navbar'
 import {
@@ -10,22 +10,21 @@ import {
   PointElement,
   LineElement,
   Title
-} from 'chart.js';
-import { downloadExcel } from 'react-export-table-to-excel';
-import { Pie } from 'react-chartjs-2';
-import { Line } from 'react-chartjs-2';
-import faker from 'faker';
-import TableAnt from './table/Table';
+} from 'chart.js'
+import { notification,DatePicker } from 'antd'
+import { downloadExcel } from 'react-export-table-to-excel'
+import { Pie } from 'react-chartjs-2'
+import { Line } from 'react-chartjs-2'
+import TableAnt from './table/Table'
 import axios from 'axios';
-import { columns } from './table/Table';
-import useFormItemStatus from 'antd/es/form/hooks/useFormItemStatus';
-import { date } from 'yup';
+import { columns } from './table/Table'
+import moment from 'moment'
 
 var header = []
 var body = []
-const exist = 0;
+const exist = 0
 function Exist() {
-  const { setDataMaterial } = useContext(UserContext)
+  const { setDataMaterial,setDataExIm } = useContext(UserContext)
   //const dataTable=
   const [dataTable, setDataTable] = React.useState([])
   const [exist, setExist] = useState(0)
@@ -33,17 +32,18 @@ function Exist() {
   const [importHis,setImportHis]=useState([])
   const [historyExIm,sethistoryExIm]=useState([])
   const [arrayLayout,setArrayLayout]=useState([])
+  const [existData,setExistData]=useState([])
   React.useEffect(() => {
     header = []
     body = []
     getData()
-    getWeek(new Date())
   }, [])
 
   async function getData() {
     const response = await axios.post('http://113.174.246.52:8082/api/returnAll_materialManagerment')
     let database = await response.data
     const database1 = []
+    let totalPrice=0;
     database.map((val, index) => {
       database1.push(
         {
@@ -55,51 +55,93 @@ function Exist() {
       body.push(
         val
       )
-      setExist(exist => exist + 1)
+      if(val['total_price']!='') totalPrice+=val['total_price']
     })
+    setExist(totalPrice)
     setDataTable(database1)
     setDataMaterial(database)
     columns.map((val, index) =>
       header.push(val.title)
     )
 
+  // thông báo
+
+
 
     //lấy lịch sử xuất nhập kho
-    const his_ = await axios.post('http://113.174.246.52:8082/api/his_materialManagerment')
-   let history = await his_.data
-   sethistoryExIm(history)
+   axios.post('http://113.174.246.52:8082/api/his_materialManagerment').
+   then(res=>{
+    let history = res.data
 
-
-   //Xuất mảng nhập và xuất trong ngày hiện diện
-   const exportHis_=[]
-   const importHis_=[]
-   const today = new Date()
-   today.setHours(0,0,0,0)
-   for(const key in history){
-    if(history[key].name_action=='Nhập'){
-      let thisDate = new Date(history[key].created_at)
-      thisDate.setHours(0,0,0,0)
-      if(thisDate.getTime()===today.getTime())
-      importHis_.push(history[key])
-      setImportHis(importHis_)
+    sethistoryExIm(history)
+    setDataExIm(history)
+ 
+ 
+    //Xuất mảng nhập và xuất trong ngày hiện diện
+    const exportHis_=[]
+    const importHis_=[]
+    const today = new Date()
+    today.setHours(0,0,0,0)
+    for(const key in history){
+     if(history[key].name_action=='Nhập'){
+       let thisDate = new Date(history[key].created_at)
+       thisDate.setHours(0,0,0,0)
+       if(thisDate.getTime()===today.getTime())
+       importHis_.push(history[key])
+       let total_price=0
+       importHis_.map(val=>{
+         if(val['total_price']!=='')
+         total_price+=val['total_price']
+       })
+ 
+       setImportHis(total_price)
+     }
+     
+     else{
+       let thisDate = new Date(history[key].created_at)
+       thisDate.setHours(0,0,0,0)
+       if(thisDate.getTime()===today.getTime())
+       exportHis_.push(history[key])
+       let total_price=0;
+       exportHis_.map(val=>{
+         if(val['total_price']!=='')
+         total_price+=val['total_price']
+       })
+       setExportHis(total_price)
+     }
+         //lấy lịch sử tồn kho
+       
+     
     }
-    
-    else{
-      let thisDate = new Date(history[key].created_at)
-      thisDate.setHours(0,0,0,0)
-      if(thisDate.getTime()===today.getTime())
-      exportHis_.push(history[key])
-      setExportHis(exportHis_)
-    }
-    
-   }
-
+ 
+   })
+ 
    //lấy danh sách layout hiện có
    const layout = await axios.post('http://113.174.246.52:8082/api/returnLayout_materialManagerment')
    let arrayLayout = await layout.data
    setArrayLayout(arrayLayout)
   }
 
+    //chốt hàng tồn kho trong tháng
+  const handleCloseExist=()=>{
+    let month = new Date().getMonth()+1
+    let year = new Date().getFullYear()
+    axios.post('http://113.174.246.52:8082/api/setExist_materialManagerment',{month,year})
+    .then((res)=>{
+      if (res.data['errno']) {
+        openNotification("THÊM DỮ LIỆU THẤT BẠI", 'error',)
+      }
+      else {
+        openNotification("THÊM DỮ LIỆU THÀNH CÔNG", 'success',)
+      }
+    })
+  }
+  const openNotification = (status, type) => {
+    notification[type]({
+      message: 'THÔNG BÁO',
+      description: status,
+    });
+  };
 
   //function export Excel
   function handleDownloadExcel() {
@@ -130,7 +172,6 @@ function Exist() {
       var datase=[]
       for(const key in data){
         if(name!=data[key].id){
-          
           lenght=parseInt(lenght)+1
           name=data[key].id
         }
@@ -187,54 +228,37 @@ function Exist() {
     },
   };
   //lấy mảng 1 tuần với ngày hiện tại
-  const labels = getWeek(new Date())
-  function getWeek(today){
-    var week= new Array(); 
-    // Starting Monday not Sunday
-    today.setDate((today.getDate() - today.getDay() +1));
-    for (var i = 0; i < 7; i++) {
-      let j = new Date(today)
-      
-        week.push(
-          j.toDateString()
-        ); 
-        today.setDate(today.getDate() +1);
-    }
-    return week
-  }
+  const labels = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12']
+
   
   //hàm lấy số liệu trong 1 ngày
  const returnDataEx=(date)=>{
+  //console.log(date)
   var result=0
-    exportHis.map((val,index)=>{
-
-      let dates= new Date(val.created_at)
-      dates.setHours(0,0,0,0)
-      let date_ = new Date(date)
-      date_.setHours(0,0,0,0)
-      if(date_.getTime()==dates.getTime()){
-        result=result+ parseInt(val.amount)
-      }
-      
-    })
+  var arraylist = historyExIm.filter(da=>new Date(da.created_at).getMonth() == new Date(date).getMonth()+1 && da.name_action=='Xuất')
+  arraylist.map((val,index)=>{
     
+    
+        if(val.total_price!==null && val.total_price!==NaN){
+          result=result+ parseInt(val.total_price)
+        }
+      
+      })
+   
     return result
   }
+
   const returnDataIm=(date)=>{
     var result=0
-      importHis.map((val,index)=>{
-  
-        let dates= new Date(val.created_at)
-        dates.setHours(0,0,0,0)
-        let date_ = new Date(date)
-        date_.setHours(0,0,0,0)
-        if(date_.getTime()==dates.getTime()){
-          result=result+ parseInt(val.amount)
+  var arraylist = historyExIm.filter(da=>new Date(da.created_at).getMonth() == new Date(date).getMonth()+1 && da.name_action=='Nhập')
+  arraylist.map((val,index)=>{
+        if(val.total_price!==null && val.total_price!==NaN){
+          result=result+ parseInt(val.total_price)
         }
-        
+      
       })
-    
-      return result
+   
+    return result
     }
  
   const dataLine = {
@@ -243,19 +267,65 @@ function Exist() {
       {
         label: 'Xuất kho',
         data: labels.map((val,index) => 
-          returnDataEx(val)
+          returnDataEx(new Date(`${new Date().getFullYear()}-${index+1}`))
         ),
         borderColor: 'rgb(255, 99, 132)',
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
       },
       {
         label: 'Nhập kho',
-        data: labels.map((val) => returnDataIm(val)),
+        data: labels.map((val,index) => returnDataIm(new Date(`${new Date().getFullYear()}-${index+1}`))),
         borderColor: 'rgb(53, 162, 235)',
         backgroundColor: 'rgba(53, 162, 235, 0.5)',
       },
     ],
   };
+
+
+  //kiểm tra lịch sử tồn kho theo tháng
+  const handleTimeExist=async(date, dateString)=>{
+    let month=''; let year='';
+    let arrDate = dateString.split('-')
+    month=arrDate[1]; year = arrDate[0];
+    var checkDateNow = new Date(dateString)
+    var dateNow = new Date()
+    if(dateNow.getFullYear()== checkDateNow.getFullYear()&& dateNow.getMonth()==checkDateNow.getMonth()){
+      const response = await axios.post('http://113.174.246.52:8082/api/returnAll_materialManagerment')
+      let database = await response.data
+      const database1 = []
+      let totalPrice=0;
+      database.map((val, index) => {
+        database1.push(
+          {
+            key: index,
+            ...val
+          }
+        )
+      })
+      setDataTable(database1)
+
+    }
+    else{
+      axios.post('http://113.174.246.52:8082/api/hisExist_materialManagerment',{year,month})
+      .then(res=>{
+        let database =res.data
+        let data=[]
+        database.map((val,index)=>{
+          data.push(
+            {
+              key:index,
+              ...val
+            }
+          )
+        })
+        setDataTable(data)
+      })
+    }
+    
+    
+    
+  }
+
   return (
     <div >
       <Container fluid bg='light'>
@@ -271,7 +341,7 @@ function Exist() {
               <Card.Header>
                 <Card.Body className='d-flex'>
                   <Card.Title className='mb-0'>
-                    SỐ LƯỢNG TỒN KHO
+                    TỔNG TIỀN TỒN KHO
                   </Card.Title>
                 </Card.Body>
               </Card.Header>
@@ -280,7 +350,7 @@ function Exist() {
                   <BsFillBarChartFill />
                 </div></Card.Title>
                 <Card.Title className='mb-0' style={{ fontSize: '25px' }}>
-                  {exist != 0 && exist}
+                  {exist != 0 && exist.toLocaleString()}
                 </Card.Title>
               </Card.Body>
 
@@ -297,7 +367,7 @@ function Exist() {
               <Card.Header>
                 <Card.Body className='d-flex'>
                   <Card.Title className='mb-0'>
-                    NHẬP KHO THEO NGÀY
+                    TỔNG TIỀN NHẬP TRONG NGÀY
                   </Card.Title>
                 </Card.Body>
               </Card.Header>
@@ -306,7 +376,7 @@ function Exist() {
                   <BsBoxArrowInLeft />
                 </div></Card.Title>
                 <Card.Title className='mb-0' style={{ fontSize: '25px' }}>
-                  {importHis&&importHis.length}
+                  {importHis&&importHis.toLocaleString()}
                 </Card.Title>
               </Card.Body>
 
@@ -324,7 +394,7 @@ function Exist() {
                 <Card.Body className='d-flex'>
 
                   <Card.Title className='mb-0' >
-                    XUẤT KHO THEO NGÀY
+                  TỔNG TIỀN XUẤT TRONG NGÀY
                   </Card.Title>
                 </Card.Body>
               </Card.Header>
@@ -333,7 +403,7 @@ function Exist() {
                   <BsBoxArrowRight />
                 </div></Card.Title>
                 <Card.Title className='mb-0' style={{ fontSize: '25px' }}>
-                  {exportHis&&exportHis.length}
+                  {exportHis&&exportHis.toLocaleString()}
                 </Card.Title>
               </Card.Body>
 
@@ -352,12 +422,13 @@ function Exist() {
           <Row className='titleTable text-center mt-5'>
             <Col className='groupTitle'>
               <div>
-                <h2></h2>
+              <DatePicker onChange={handleTimeExist} picker="month" />
               </div>
               <div>
                 <h2>BẢNG TỒN KHO</h2>
               </div>
               <div>
+              <Button variant="warning" onClick={handleCloseExist} style={{marginRight:'20px'}}>CHỐT TỒN KHO</Button>
                 <Button onClick={handleDownloadExcel}>export</Button>
               </div>
             </Col>

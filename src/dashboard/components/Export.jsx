@@ -1,8 +1,8 @@
 import React from 'react'
 import { useState, useContext } from 'react';
 import axios from 'axios';
-import { MDBInput, MDBContainer, MDBRow, MDBCol, MDBBtn } from 'mdb-react-ui-kit';
-import { AutoComplete, notification, Input } from 'antd';
+import { MDBInput, MDBContainer, MDBRow, MDBCol, MDBBtn, } from 'mdb-react-ui-kit';
+import { AutoComplete, notification, Input, Select } from 'antd';
 import { UserOutlined } from "@ant-design/icons";
 import 'antd/dist/antd.css';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css'
@@ -11,9 +11,11 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup'
 import { UserContext } from './Navbar'
 function Export() {
+  const { Option } = Select;
   const { dataMaterial } = useContext(UserContext)
   const [img, setImg] = useState('')
-  var idMaterial=''
+  const [uniPrice, setUnitPrice] = useState([])
+  var idMaterial = ''
   const initData = {
     id: '',
     name: '',
@@ -44,12 +46,11 @@ function Export() {
 
   const setOptions = []
   const handleDataAutoCompleteMVT = (dataMaterial) => {
-    
     dataMaterial && dataMaterial.map((val, index) => {
       setOptions.push(
         {
-          id:val.id,
-          value:val.name
+          id: val.id,
+          value: val.name
         },
       )
     })
@@ -63,73 +64,65 @@ function Export() {
       description: status,
     });
   };
-
-
-
   //console.log(img)
   //submit vào csld  
   const handleSubmit = (values, { resetForm }) => {
 
     formik.values['user'] = JSON.parse(localStorage.getItem('user'))
-    
-    console.log(values)
-       axios.post('http://113.174.246.52:8082/api/export_materialManagerment', {
-        data: values
-      }).then((response) => {
-        // if (response.data['errno']) {
-        //   openNotification("THÊM DỮ LIỆU THẤT BẠI", 'error',)
-        // }
-        // else {
-        //   openNotification("THÊM DỮ LIỆU THÀNH CÔNG", 'success',)
-        //   setImg('')
-        //   resetForm({ values: '' })
+    axios.post('http://113.174.246.52:8082/api/export_materialManagerment', {
+      data: values
+    }).then((response) => {
+      if (response.data == 'Xuất thành công') {
+        openNotification(response.data, 'success')
+        resetForm({ values: '' })
+      }
+      else
+        openNotification(response.data, 'error')
 
-        // }
-        console.log(response.data)
-        if(response.data=='Xuất thành công'){
-          openNotification(response.data,'success')
-          resetForm({ values: '' })
-        }
-        else
-        openNotification(response.data,'error')
-        
-      })
+    })
   }
-
-
+  const handleSelectUnitPrice = (values) => {
+    var keyprop = uniPrice.indexOf(uniPrice.filter(da=>da.unit_price==values)[0])
+    setValueforFormik(keyprop,uniPrice)
+  }
   //load thông tin nếu mã id đã tồn tại
   const handleLoadId = () => {
-      var id=idMaterial!=''?idMaterial:formik.values.id
-  
-      axios.post('http://113.174.246.52:8082/api/returnInfoID_materialManagerment', {
-        id: id
-      }).then((response) => {
-      
-        const data = response.data[0]
-        formik.values=initData
-        if (data) {
-          formik.setFieldValue('id',data.id)
-          formik.setFieldValue('name', data.name)
-          formik.setFieldValue('unit', data.unit)
-          formik.setFieldValue('amount', data.amount)
-          formik.setFieldValue('unitPrice', data.unit_price)
-          formik.setFieldValue('idType', data.id_type)
-          formik.setFieldValue('device', data.device)
-          formik.setFieldValue('group', data.groups_material)
-          formik.setFieldValue('dept', data.dept)
-          formik.setFieldValue('otherName', data.other_name)
-          formik.setFieldValue('supplier', data.supplier)
-          data.img && setImg(data.img)
-          formik.setFieldValue('position', data.id_layout)
+    var id = idMaterial != '' ? idMaterial : formik.values.id
 
-        }
-      })
+    axios.post('http://113.174.246.52:8082/api/returnInfoID_materialManagerment', {
+      id: id
+    }).then((response) => {
+
+      const data = response.data
+      formik.values = initData
+
+      setUnitPrice(data)
+      if (data) {
+        setValueforFormik(0, data)
+      }
+    })
   }
-  const onSelect=(values)=>{
-  
-   var id= setOptions.find(item=>item.value===values)
-  idMaterial=id.id
-   handleLoadId(id.id)
+
+  const setValueforFormik = (key, data) => {
+    formik.setFieldValue('id', data[key].id)
+    formik.setFieldValue('name', data[key].name)
+    formik.setFieldValue('unit', data[key].unit)
+    formik.setFieldValue('amount', data[key].amount)
+    formik.setFieldValue('unitPrice', data[key].unit_price)
+    formik.setFieldValue('idType', data[key].id_type)
+    formik.setFieldValue('device', data[key].device)
+    formik.setFieldValue('group', data[key].groups_material)
+    formik.setFieldValue('dept', data[key].dept)
+    formik.setFieldValue('otherName', data[key].other_name)
+    formik.setFieldValue('supplier', data[key].supplier)
+    data.img && setImg(data[key].img)
+    formik.setFieldValue('position', data[key].id_layout)
+  }
+
+  const onSelect = (values) => {
+    var id = setOptions.find(item => item.value === values)
+    idMaterial = id.id
+    handleLoadId(id.id)
   }
   return (
     <MDBContainer>
@@ -167,6 +160,7 @@ function Export() {
               }
               onSelect={onSelect}
               value={formik.values.name}
+              
             >
               <Input id='name' name='name' size="large" placeholder="Nhập tên vật tư" />
             </AutoComplete>
@@ -188,9 +182,9 @@ function Export() {
               name='otherName'
               value={formik.values.otherName}
               onChange={formik.handleChange}
-              label='Tên vật tư rút gọn' type='text' size='lg' 
+              label='Tên vật tư rút gọn' type='text' size='lg'
               disabled={true}
-              />
+            />
           </MDBCol>
           <MDBCol size='md-4'>
             <MDBInput
@@ -198,9 +192,9 @@ function Export() {
               name='device'
               value={formik.values.device}
               onChange={formik.handleChange}
-              label='Thiết bị' type='text' size='lg' 
+              label='Thiết bị' type='text' size='lg'
               disabled={true}
-              />
+            />
           </MDBCol>
           <MDBCol size='md-4'>
             <MDBInput
@@ -208,9 +202,9 @@ function Export() {
               name='idType'
               value={formik.values.idType}
               onChange={formik.handleChange}
-              label='Nhóm vật tư' type='text' size='lg' 
+              label='Nhóm vật tư' type='text' size='lg'
               disabled={true}
-              />
+            />
           </MDBCol>
         </MDBRow>
         <MDBRow className='mb-3'>
@@ -240,29 +234,34 @@ function Export() {
               name='amount'
               value={formik.values.amount}
               onChange={formik.handleChange}
-              label='Số lượng' type='text' size='lg' 
-             
-              />
-            
+              label='Số lượng' type='text' size='lg'
+
+            />
+
           </MDBCol>
           <MDBCol size='md-2'>
-            <MDBInput
-              id='unitPirce'
+            <Select
+              id='unitPrice'
               name='unitPrice'
               value={formik.values.unitPrice}
-              onChange={formik.handleChange}
-              label='Đơn giá' type='text' size='lg' 
-              disabled={true}
-              />
+              style={{
+                height: '100%',
+                width: '100%'
+              }}
+              onChange={handleSelectUnitPrice}
+            >
+              {uniPrice && uniPrice.map((val, index) => (<Option key={index} value={val.unit_price}>{val.unit_price}</Option>))}
+
+            </Select>
           </MDBCol>
           <MDBCol size='md-2' className='positionLayout'>
             <MDBInput
               id='position'
               name='position'
               value={formik.values.position}
-              label='Vị trí' type='text' size='lg' 
+              label='Vị trí' type='text' size='lg'
               disabled={true}
-              />
+            />
           </MDBCol>
         </MDBRow>
 
