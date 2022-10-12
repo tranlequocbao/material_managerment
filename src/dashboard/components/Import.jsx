@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useState } from 'react';
 import Barcode from 'react-barcode/lib/react-barcode'
 import axios from 'axios';
@@ -9,6 +9,7 @@ import 'mdb-react-ui-kit/dist/css/mdb.min.css'
 import '../Styles/Import.css'
 import { useFormik } from 'formik';
 import * as Yup from 'yup'
+import { UserContext } from './Navbar'
 function Import() {
   const { Option } = Select;
   const [img, setImg] = useState('')
@@ -18,6 +19,7 @@ function Import() {
   const [status, setStatus] = useState('insert')
   const [barcode,setBarcode]=useState('')
   const [totalPrice,setTotalPrice]=useState(0)
+  const {setPage}=useContext(UserContext)
   const initData = {
     id: '',
     name: '',
@@ -71,9 +73,20 @@ function Import() {
   }
   //console.log(img)
   //submit vào csld
-
+  const Print = () =>{     
+    var divContents = document.getElementById("barcode").innerHTML;
+    var a = window.open('', '', 'height=500, width=500');
+    a.document.write('<html>');
+    a.document.write('<body > <h1>Div contents are <br>');
+    a.document.write(divContents);
+    a.document.write('</body></html>');
+    a.document.close();
+    a.print();
+  }
 
   const handleSubmit = (values, { resetForm }) => {
+    
+   
     if(formik.values.id===''){
       openNotification('Kiểm tra lại mã ID','error')
       return false
@@ -96,11 +109,12 @@ function Import() {
           openNotification("THÊM DỮ LIỆU THẤT BẠI", 'error',)
         }
         else {
+          
           openNotification("THÊM DỮ LIỆU THÀNH CÔNG", 'success',)
           setImg('')
           setTotalPrice(0)
           resetForm({ values: '' })
-
+          Print()
         }
       })
     }
@@ -112,12 +126,25 @@ function Import() {
           openNotification("CẬP NHẬT LIỆU THẤT BẠI", 'error',)
         }
         else {
-          openNotification("CẬP NHẬT LIỆU THÀNH CÔNG", 'success',)
-          setImg('')
-          resetForm({ values: '' })
+          let newPromise = new Promise(function(res,rej){
+            setTimeout(() => {
+              Print()
+              res(true)
+            }, 1000);
+          })
+          newPromise.
+          then(function(value){
+            openNotification("CẬP NHẬT LIỆU THÀNH CÔNG", 'success',)
+            setImg('')
+            resetForm({ values: '' })
+            setPage('import')
+          })
+         
+          
         }
       })
     }
+    
   }
   //get thành tiền
 const handleTotalPrice=()=>{
@@ -404,7 +431,7 @@ const handleTotalPrice=()=>{
         </MDBRow>
       </form>
 
-      {barcode&&<div>{barcode}</div>}
+      {barcode&&<div id='barcode'>{barcode}</div>}
     </MDBContainer>
   )
 }

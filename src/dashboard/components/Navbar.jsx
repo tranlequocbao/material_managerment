@@ -98,7 +98,8 @@ const Navbar = () => {
       dataMaterial,
       setDataMaterial,
       dataExIm,
-      setDataExIm
+      setDataExIm,
+      setPage
       }}>
     <Layout
       style={{

@@ -1,27 +1,45 @@
-import React, { useContext } from 'react'
+import React, { useEffect, useState } from 'react'
 import TableExport from './table/TableExport'
 import { UserContext } from './Navbar'
 import { Container, Row, Col, Card, CardGroup, Button } from 'react-bootstrap'
 import { DatePicker } from 'antd'
 import moment from 'moment';
+import axios from 'axios'
 function ReportExport() {
   const { RangePicker } = DatePicker;
-  const { dataExIm } = useContext(UserContext)
+  const [dataEx,setDataEx]=useState([])
+  const [dataDate,setDataDate]=useState([])
+  useEffect(()=>{
+    if(dataDate==''){
+      setDataDate([{'StartDay':`${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`,'EndDay':`${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`}])
+    }
+    getDataEx(dataDate)
+  },[dataDate])
+
+  function getDataEx(dataDate){
+    if(dataDate!=''){
+      let Type ='Xuất'
+      let Start=dataDate[0].StartDay
+      let End =dataDate[0].EndDay
+      axios.post('http://113.174.246.52:8082/api/his_materialManagerment',{Start,End,Type})
+      .then((res)=>{
+        setDataEx(res.data)
+      } )
+    }
+  }
 
   const filterData = (data) => {
     var result = []
     data.map((val, index) => {
-      if (val.name_action == 'Xuất')
         result.push({
           key: index,
           ...val
         })
     })
     return result
-
   }
   const onChange = (dates, dateStrings) => {
-    console.log('From: ', dateStrings[0], ', to: ', dateStrings[1]);
+    setDataDate([{StartDay:dateStrings[0],EndDay:dateStrings[1]}])
   }
   return (
     <div>
@@ -29,7 +47,7 @@ function ReportExport() {
       <Row>
         <Col md={10}>
           <RangePicker
-            defaultValue={moment(new Date(), 'YYYY-MM-DD')}
+            defaultValue={[moment(), moment()]}
             ranges={{
               Today: [moment(), moment()],
               'This Month': [moment().startOf('month'), moment().endOf('month')],
@@ -40,7 +58,7 @@ function ReportExport() {
 
       </Row>
       <Row>
-        <TableExport value={filterData(dataExIm ? dataExIm : '')} />
+        <TableExport value={filterData(dataEx ? dataEx : '')} />
       </Row>
 
 

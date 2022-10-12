@@ -124,7 +124,7 @@ function TableAnt(props) {
       {
         title: 'Đơn vị',
         dataIndex: 'unit',
-        key: 'address',
+        key: 'unit',
         width: '5%',
         sorter: (a, b) => a.unit.length - b.unit.length,
         sortDirections: ['descend', 'ascend'],
@@ -132,7 +132,7 @@ function TableAnt(props) {
       {
         title: 'Số lượng',
         dataIndex: 'amount',
-        key: 'address',
+        key: 'amount',
         width: '5%',
         sorter: (a, b) => a.amount.length - b.amount.length,
         sortDirections: ['descend', 'ascend'],
@@ -140,7 +140,7 @@ function TableAnt(props) {
       {
         title: 'Đơn giá',
         dataIndex: 'unit_price',
-        key: 'address',
+        key: 'unit_price',
         width: '5%',
         sorter: (a, b) => a.unit_price.length - b.unit_price.length,
         sortDirections: ['descend', 'ascend'],
@@ -148,7 +148,7 @@ function TableAnt(props) {
       {
         title: 'Thành tiền',
         dataIndex: 'total_price',
-        key: 'address',
+        key: 'total_price',
         width: '5%',
         sorter: (a, b) => a.unit_price.length - b.unit_price.length,
         sortDirections: ['descend', 'ascend'],
@@ -156,7 +156,7 @@ function TableAnt(props) {
       {
         title: 'Tên vật tư',
         dataIndex: 'other_name',
-        key: 'address',
+        key: 'other_name',
         width: '5%',
         sorter: (a, b) => a.other_name.length - b.other_name.length,
         sortDirections: ['descend', 'ascend'],
@@ -164,7 +164,7 @@ function TableAnt(props) {
       {
         title: 'Thiết bị',
         dataIndex: 'device',
-        key: 'address',
+        key: 'device',
         width: '5%',
         sorter: (a, b) => a.device.length - b.device.length,
         sortDirections: ['descend', 'ascend'],
@@ -172,7 +172,7 @@ function TableAnt(props) {
       {
         title: 'Nhóm vật tư',
         dataIndex: 'groups_material',
-        key: 'address',
+        key: 'groups_material',
         width: '5%',
         sorter: (a, b) => a.groups_material.length - b.groups_material.length,
         sortDirections: ['descend', 'ascend'],
@@ -180,7 +180,7 @@ function TableAnt(props) {
       {
         title: 'Xưởng/Bộ phận',
         dataIndex: 'dept',
-        key: 'address',
+        key: 'dept',
         width: '5%',
         sorter: (a, b) => a.dept.length - b.dept.length,
         sortDirections: ['descend', 'ascend'],
@@ -188,7 +188,7 @@ function TableAnt(props) {
       {
         title: 'NCC',
         dataIndex: 'supplier',
-        key: 'address',
+        key: 'supplier',
         width: '5%',
         ...getColumnSearchProps('supplier'),
         //sorter: (a, b) => a.supplier.length - b.supplier.length,
@@ -200,7 +200,7 @@ function TableAnt(props) {
       {
         title: 'Vị trí',
         dataIndex: 'id_layout',
-        key: 'address',
+        key: 'id_layout',
         width: '5%',
         ...getColumnSearchProps('id_layout'),
         onFilter: (value, record) => record.id_layout.indexOf(value) === 0, 
