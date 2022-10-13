@@ -93,6 +93,7 @@ export default function Login() {
                                             name='msnv'
                                             value={formik.values.msnv}
                                             onChange={formik.handleChange}
+                                            onPressEnter={formik.handleSubmit}
                                         />
                                         {formik.errors.msnv && (<p className='error'>{formik.errors.msnv}</p>)}
                                     </div>
@@ -104,7 +105,9 @@ export default function Login() {
                                             prefix={<KeyOutlined />}
                                             id='pass'
                                             value={formik.values.pass}
-                                            onChange={formik.handleChange} />
+                                            onChange={formik.handleChange} 
+                                            onPressEnter={formik.handleSubmit}
+                                            />
                                         {formik.errors.pass && (<p className='error'>{formik.errors.pass}</p>)}
                                     </div>
                                     <div className='formLogin submit'>

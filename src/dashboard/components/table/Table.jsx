@@ -130,14 +130,6 @@ function TableAnt(props) {
         sortDirections: ['descend', 'ascend'],
       },
       {
-        title: 'Số lượng',
-        dataIndex: 'amount',
-        key: 'amount',
-        width: '5%',
-        sorter: (a, b) => a.amount.length - b.amount.length,
-        sortDirections: ['descend', 'ascend'],
-      },
-      {
         title: 'Đơn giá',
         dataIndex: 'unit_price',
         key: 'unit_price',
@@ -145,6 +137,15 @@ function TableAnt(props) {
         sorter: (a, b) => a.unit_price.length - b.unit_price.length,
         sortDirections: ['descend', 'ascend'],
       },
+      {
+        title: 'Số lượng',
+        dataIndex: 'amount',
+        key: 'amount',
+        width: '5%',
+        sorter: (a, b) => a.amount.length - b.amount.length,
+        sortDirections: ['descend', 'ascend'],
+      },
+   
       {
         title: 'Thành tiền',
         dataIndex: 'total_price',

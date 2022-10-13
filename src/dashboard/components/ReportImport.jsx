@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import TableExport from './table/TableExport'
 import { UserContext } from './Navbar'
-import { Row, Col} from 'react-bootstrap'
+import { Row, Col,Button} from 'react-bootstrap'
+import { downloadExcel } from 'react-export-table-to-excel'
 import { DatePicker } from 'antd'
 import moment from 'moment';
 import axios from 'axios'
+import {columns} from './table/TableExport'
 function ReportImport() {
   const { RangePicker } = DatePicker;
   const [dataIm,setDataIm]=useState([])
   const [dataDate,setDataDate]=useState([])
+  var header=[]
   useEffect(()=>{
     if(dataDate==''){
       setDataDate([{'StartDay':`${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`,'EndDay':`${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`}])
     }
     getDataEx(dataDate)
+
   },[dataDate])
 
   function getDataEx(dataDate){
@@ -41,10 +45,26 @@ function ReportImport() {
   const onChange = (dates, dateStrings) => {
     setDataDate([{StartDay:dateStrings[0],EndDay:dateStrings[1]}])
   }
+
+  const handleExportExcel=()=>{
+    columns.map((val, index) =>
+      header.push(val.title)
+    )
+
+    downloadExcel({
+      fileName: "bc nhap kho" + Date(),
+      sheet: "ketqua",
+      tablePayload: {
+        header,
+        // accept two different data structures
+        body: dataIm
+      },
+    });
+  }
   return (
     <div>
 
-      <Row>
+      <Row style={{marginBottom:'20px'}}>
         <Col md={10}>
           <RangePicker
             defaultValue={[moment(), moment()]}
@@ -55,7 +75,9 @@ function ReportImport() {
             onChange={onChange}
           />
         </Col>
-
+        <Col md={2}>
+          <Button onClick={handleExportExcel}>Xuất Excel</Button>
+        </Col>
       </Row>
       <Row>
         <TableExport value={filterData(dataIm ? dataIm : '')} />
