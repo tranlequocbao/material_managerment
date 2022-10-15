@@ -47,7 +47,6 @@ function Exist() {
     let database = await response.data
     const database1 = []
     let totalPrice = 0;
-    console.log(database)
     database.map((val, index) => {
       database1.push(
         {
