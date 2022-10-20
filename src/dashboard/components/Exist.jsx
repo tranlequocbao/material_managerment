@@ -1,9 +1,10 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext,createContext } from 'react'
 import { Container, Row, Col, Card, CardGroup, Button } from 'react-bootstrap'
 import { BsFillBarChartFill, BsBoxArrowInLeft, BsBoxArrowRight } from 'react-icons/bs'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '../Styles/Exist.css'
 import { UserContext } from './Navbar'
+
 import {
   Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale,
   LinearScale,
@@ -18,14 +19,15 @@ import { Line } from 'react-chartjs-2'
 import 'chartjs-plugin-datalabels';
 import TableAnt from './table/Table'
 import axios from 'axios';
-import { columns } from './table/Table'
 
+//import { columns } from './table/Table'
 
+export const setColumn = createContext()
 var header = []
 var body = []
-const exist = 0
 function Exist() {
   const { setDataMaterial } = useContext(UserContext)
+  const [columns,setColumns] =useState([])
   //const dataTable=
   const [dataTable, setDataTable] = React.useState([])
   const [exist, setExist] = useState(0)
@@ -33,8 +35,8 @@ function Exist() {
   const [importHis, setImportHis] = useState([])
   const [historyExIm, sethistoryExIm] = useState([])
   const [arrayLayout, setArrayLayout] = useState([])
-  const [existData, setExistData] = useState([])
-  const [amountExistForMonth, setamountExistForMonth] = useState([])
+  const [checkNow,setCheckNow]=useState(true)
+ 
   React.useEffect(() => {
     header = []
     body = []
@@ -42,7 +44,6 @@ function Exist() {
   }, [])
 
   async function getData() {
-  
     const response = await axios.post('http://113.174.246.52:8082/api/returnAll_materialManagerment')
     let database = await response.data
     const database1 = []
@@ -67,13 +68,10 @@ function Exist() {
     setExist(totalPrice)
     setDataTable(database1)
     setDataMaterial(database)
-    columns.map((val, index) =>
-      header.push(val.title)
-    )
+    
+  
 
     // thông báo
-
-
 
     //lấy lịch sử xuất nhập kho
     let Start = `${new Date().getFullYear()}-01-01`
@@ -157,14 +155,17 @@ function Exist() {
       })
   }
   const openNotification = (status, type) => {
-    notification[type]({
+    notification[type]({  
       message: 'THÔNG BÁO',
       description: status,
-    });
-  };
+    })
+  }
 
   //function export Excel
   function handleDownloadExcel() {
+    columns.map((val, index) =>
+    header.push(val.title)
+  )
     downloadExcel({
       fileName: "bc tonkho" + Date(),
       sheet: "ketqua",
@@ -173,7 +174,7 @@ function Exist() {
         // accept two different data structures
         body: body
       },
-    });
+    })
   }
 
   ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale,
@@ -283,17 +284,17 @@ function Exist() {
     return result
   }
 
-  const returnDataExist = (date) => {
-    var result = 0
-    if (amountExistForMonth) {
-      amountExistForMonth.map((val, index) => {
-        if (val.MONTHSUM === date)
-          result = parseInt(val.count)
-      })
-    }
-    return result
+  // const returnDataExist = (date) => {
+  //   var result = 0
+  //   if (amountExistForMonth) {
+  //     amountExistForMonth.map((val, index) => {
+  //       if (val.MONTHSUM === date)
+  //         result = parseInt(val.count)
+  //     })
+  //   }
+  //   return result
 
-  }
+  // }
 
   const dataLine = {
     labels,
@@ -343,7 +344,7 @@ function Exist() {
         )
       })
       setDataTable(database1)
-
+      setCheckNow(true)
     }
     else {
       axios.post('http://113.174.246.52:8082/api/hisExist_materialManagerment', { year, month })
@@ -359,6 +360,7 @@ function Exist() {
             )
           })
           setDataTable(data)
+          setCheckNow(false)
         })
     }
 
@@ -472,11 +474,10 @@ function Exist() {
                 <Button onClick={handleDownloadExcel}>export</Button>
               </div>
             </Col>
-
-
           </Row>
-
-          <TableAnt value={dataTable} />
+          <setColumn.Provider value={{setColumns,checkNow}}>
+            <TableAnt value={dataTable} />
+          </setColumn.Provider>
         </Row>
       </Container>
     </div>

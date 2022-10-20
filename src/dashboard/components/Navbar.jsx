@@ -188,7 +188,7 @@ const Navbar = () => {
       </Layout>
     </Layout>
     </UserContext.Provider>
-  );
-};
+  )
+}
 
 export default Navbar;

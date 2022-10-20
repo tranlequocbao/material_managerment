@@ -1,21 +1,61 @@
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, Input, Space, Table, Modal, Form, Row, Col,notification } from 'antd';
-import React, { useRef, useState } from 'react';
+import { Button, Input, Space, Table, Form, notification, Popconfirm, Typography } from 'antd';
+import React, { useContext, useRef, useState } from 'react';
 import Highlighter from 'react-highlight-words';
-import { useFormik } from 'formik';
-import * as Yup from 'yup'
 import axios from 'axios';
+import { setColumn } from '../Exist';
 
-var columns = []
+const EditableCell = ({
+  editing,
+  dataIndex,
+  title,
+  inputType,
+  record,
+  index,
+  children,
+  ...restProps
+}) => {
+
+  return (
+    <td {...restProps}>
+      {editing ? (
+        <Form.Item
+          name={dataIndex}
+          style={{
+            margin: 0,
+          }}
+          rules={[
+            {
+              required: true,
+              message: `Please Input ${title}!`,
+            },
+          ]}
+        >
+          {<Input />}
+        </Form.Item>
+      ) : (
+        children
+      )}
+    </td>
+  );
+};
+
 function TableAnt(props) {
-
+  console.log(props)
+  const {setColumns,checkNow}=useContext(setColumn)
+  const [dataTable,setDataTable]=useState('')
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
+
+  ///... form for edit cell table
+  const [form] = Form.useForm();
+  const [editingKey, setEditingKey] = useState('')
+  React.useEffect(()=>{
+    setColumns(columns)
+    setDataTable(props.value)
+  },[props.value])
+  const isEditing = (record) => record.key === editingKey;
   // thông báo
   const openNotification = (status, type) => {
     notification[type]({
@@ -23,49 +63,47 @@ function TableAnt(props) {
       description: status,
     });
   };
-  //using formik for modify value of table exist
-  const formik = useFormik({
-    initialValues: {
-      id: '',
-      name: '',
-      unit: '',
-      otherName: '',
-      device: '',
-      groupsMaterial: '',
-      dept: ''
-    },
-    validationSchema: Yup.object({
-      name: Yup.string().required('Vui lòng nhập tên vật tư'),
-      unit: Yup.string().required('Vui lòng nhập đơn vị'),
 
-    }),
-    onSubmit: (values) => {
-      onSubmitModify(values)
+  console.log(checkNow)
+  const onSubmitModify = async (value) => {
+    try {
+      const row = await form.validateFields();
+      const newData =[...props.value]
+      const index = newData.findIndex((items)=>value['key']===items.key)
+      const values={'id':value['id'],'supplierOld':value['supplier'],'unit_price':value['unit_price'],'idLayoutOld':value['id_layout'],...row}
+      const item = newData[index];
+      newData.splice(index, 1, {
+        ...item,
+        ...row,
+      });
+          axios.post('http://113.174.246.52:8082/api/modifyInfo_materialManagerment', { values })
+      .then((res) => {
+        if (res.data['errno']) {
+          openNotification("THÊM DỮ LIỆU THẤT BẠI", 'error',)
+          setEditingKey('');
+        }
+        else
+          openNotification("HIỆU CHỈNH DỮ LIỆU THÀNH CÔNG", 'success',)
+          setDataTable(newData)
+          setEditingKey('');
+      })
+    } catch (errInfo) {
+      console.log('Validate Failed:', errInfo);
     }
-  })
-  const handleCancel = () => {
-    setIsModalOpen(false);
+    
+  }
+  
+  const edit = (record) => {
+    form.setFieldsValue({
+      ...record,
+    });
+    setEditingKey(record.key);
   };
-  const onSubmitModify = (values) => {
-   
-    axios.post('http://113.174.246.52:8082/api/modifyInfo_materialManagerment',{values})
-    .then((res)=>{
-      if (res.data['errno']) {
-        openNotification("THÊM DỮ LIỆU THẤT BẠI", 'error',)
-      }
-      else window.location.reload()
-    })
-  }
-  const handleModify = (values) => {
-    formik.values.id = values.id
-    formik.values.name = values.name
-    formik.values.unit = values.unit
-    formik.values.otherName = values.other_name
-    formik.values.device = values.device
-    formik.values.groupsMaterial = values.groups_material
-    formik.values.dept = values.dept
-    setIsModalOpen(true);
-  }
+
+
+  const cancel = () => {
+    setEditingKey('');
+  };
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -163,42 +201,45 @@ function TableAnt(props) {
       ),
   });
 
-  columns = [
+  const columns = [
     {
       title: 'Mã vật tư',
       dataIndex: 'id',
-      key: 'name',
-      width: '5%',
+      key: 'id',
+      width: '10%',
       ...getColumnSearchProps('id'),
     },
     {
       title: 'Tên Hàng',
       dataIndex: 'name',
-      key: 'age',
       width: '20%',
+      key: 'name',
+      editable: checkNow&&true,
       ...getColumnSearchProps('name'),
     },
     {
       title: 'Đơn vị',
       dataIndex: 'unit',
+      width: '10%',
       key: 'unit',
-      width: '5%',
       sorter: (a, b) => a.unit.length - b.unit.length,
       sortDirections: ['descend', 'ascend'],
+      editable: true,
     },
     {
       title: 'Đơn giá',
       dataIndex: 'unit_price',
+      width: '15%',
       key: 'unit_price',
-      width: '5%',
       sorter: (a, b) => a.unit_price.length - b.unit_price.length,
       sortDirections: ['descend', 'ascend'],
+
     },
     {
       title: 'Số lượng',
       dataIndex: 'amount',
+      width: '15%',
       key: 'amount',
-      width: '5%',
       sorter: (a, b) => a.amount.length - b.amount.length,
       sortDirections: ['descend', 'ascend'],
     },
@@ -207,7 +248,7 @@ function TableAnt(props) {
       title: 'Thành tiền',
       dataIndex: 'total_price',
       key: 'total_price',
-      width: '5%',
+      width: '15%',
       sorter: (a, b) => a.unit_price.length - b.unit_price.length,
       sortDirections: ['descend', 'ascend'],
     },
@@ -215,39 +256,44 @@ function TableAnt(props) {
       title: 'Tên vật tư',
       dataIndex: 'other_name',
       key: 'other_name',
-      width: '5%',
+      width: '15%',
       sorter: (a, b) => a.other_name.length - b.other_name.length,
       sortDirections: ['descend', 'ascend'],
+      editable: true,
     },
     {
       title: 'Thiết bị',
       dataIndex: 'device',
       key: 'device',
-      width: '5%',
+      width: '15%',
       sorter: (a, b) => a.device.length - b.device.length,
       sortDirections: ['descend', 'ascend'],
+      editable: true,
     },
     {
       title: 'Nhóm vật tư',
       dataIndex: 'groups_material',
       key: 'groups_material',
-      width: '5%',
+      width: '15%',
       sorter: (a, b) => a.groups_material.length - b.groups_material.length,
       sortDirections: ['descend', 'ascend'],
+      editable: true,
     },
     {
       title: 'Xưởng/Bộ phận',
       dataIndex: 'dept',
       key: 'dept',
-      width: '5%',
+      width: '15%',
       sorter: (a, b) => a.dept.length - b.dept.length,
       sortDirections: ['descend', 'ascend'],
+      editable: true,
     },
     {
       title: 'NCC',
       dataIndex: 'supplier',
       key: 'supplier',
-      width: '5%',
+      width: '15%',
+      editable: true,
       ...getColumnSearchProps('supplier'),
       //sorter: (a, b) => a.supplier.length - b.supplier.length,
       //sortDirections: ['descend', 'ascend'],
@@ -259,133 +305,75 @@ function TableAnt(props) {
       title: 'Vị trí',
       dataIndex: 'id_layout',
       key: 'id_layout',
-      width: '5%',
+      width: '15%',
+      editable: true,
       ...getColumnSearchProps('id_layout'),
       onFilter: (value, record) => record.id_layout.indexOf(value) === 0,
     },
     {
-      title: 'Sửa Thông tin',
-      key: 'action',
-      width: '5%',
-      render: (_, record) => (
-        <Button onClick={() => handleModify(record)}>Sửa</Button>
-      ),
+      title: 'Sửa',
+      dataIndex: 'operation',
+      width: '15%',
+      render: checkNow&& ( (_, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <span>
+            <Typography.Link
+              onClick={() => onSubmitModify(record)}
+              style={{
+                marginRight: 8,
+              }}
+            >
+              Lưu
+            </Typography.Link>
+            <Popconfirm title="Bạn có muốn hủy?" onConfirm={cancel}>
+              <a>Hủy</a>
+            </Popconfirm>
+          </span>
+        ) : (
+          <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
+            Hiệu chỉnh
+          </Typography.Link>
+        );
+      }),
     },
 
   ];
+  const mergedColumns = columns.map((col) => {
+    if (!col.editable) {
+      return col;
+    }
+    return {
+      ...col,
+      onCell: (record) => ({
+        record,
+        inputType: 'text',
+        dataIndex: col.dataIndex,
+        title: col.title,
+        editing: isEditing(record),
+      }),
+    };
+  });
+
   return (
-    <>
-      <Table
-        columns={columns}
-        dataSource={props.value}
-        scroll={{ x: 'calc(700px + 50%)', y: 500 }}
-        pagination={{ showSizeChanger: true, pageSizeOptions: ['10', '20', '30', '50', '100'], defaultPageSize: '10' }}
-      />;
-      <Modal title="Hiệu chỉnh thông tin" open={isModalOpen} onOk={formik.handleSubmit} onCancel={handleCancel}>
-        <Row>
-          <Col span={20} offset={2}>
-            <div className="body">
-
-              <Row>
-                <Space
-                  direction="vertical"
-                  size="middle"
-                  style={{
-                    display: 'flex',
-                    width:'100%'
-                  }}
-
-                >
-                  <Col span={24}  >
-                    <label>Mã vật tư</label>
-                    <Input
-                      className='mdId'
-                      id='id'
-                      name='id'
-                      value={formik.values.id}
-                      disabled
-                    />
-                  </Col>
-                  <Col span={24}  >
-                    <label>Mật khẩu</label>
-                    <Input
-                      className='mdName'
-                      placeholder="Tên vật tư"
-                      id='name'
-                      name='name'
-                      value={formik.values.name}
-                      onChange={formik.handleChange}
-                      style={{
-                    display: 'flex',
-                    width:'100%'
-                  }}
-                    />
-                    {formik.errors.name && (<p className='error'>{formik.errors.name}</p>)}
-                  </Col>
-                  <Col span={24}  >
-                    <label>Đơn vị</label>
-                    <Input
-                      className='mdUnit'
-                      id='unit'
-                      name='unit'
-                      placeholder="Đơn vị tính"
-                      value={formik.values.unit}
-                      onChange={formik.handleChange}
-                    />
-                    {formik.errors.unit && (<p className='error'>{formik.errors.unit}</p>)}
-                  </Col>
-                  <Col span={24} >
-                    <label>Tên vật tư rút gọn</label>
-                    <Input
-                      className='mdUnit'
-                      id='otherName'
-                      name='otherName'
-                      placeholder="Tên vật tư rút gọn"
-                      value={formik.values.otherName}
-                      onChange={formik.handleChange}
-                    />
-                  </Col>
-                  <Col span={24} >
-                    <label>Thiết bị</label>
-                    <Input
-                      className='mdDevice'
-                      id='device'
-                      name='device'
-                      placeholder="Tên thiết bị"
-                      value={formik.values.device}
-                      onChange={formik.handleChange}
-                    />
-                  </Col>
-                  <Col span={24}  >
-                    <label>Nhóm vật tư</label>
-                    <Input
-                      className='mdGroupMaterial'
-                      id='groupsMaterial'
-                      name='groupsMaterial'
-                      placeholder="Tên nhóm vật tư"
-                      value={formik.values.groupsMaterial}
-                      onChange={formik.handleChange}
-                    />
-                  </Col>
-                  <Col span={24}  >
-                    <label>Bộ phận</label>
-                    <Input
-                      className='mdDept'
-                      id='dept'
-                      name='dept'
-                      placeholder="Tên bộ phận"
-                      value={formik.values.dept}
-                      onChange={formik.handleChange}
-                    />
-                  </Col>
-                </Space>
-              </Row>
-            </div>
-          </Col>
-        </Row>
-      </Modal>
-    </>)
+    
+      <Form form={form} component={false}>
+        <Table
+          components={{
+            body: {
+              cell: EditableCell,
+            },
+          }}
+          rowClassName="editable-row"
+          columns={mergedColumns}
+          dataSource={dataTable&&dataTable}
+          scroll={{ x: 'calc(700px + 50%)', y: 500 }}
+          pagination={{ showSizeChanger: true, pageSizeOptions: ['10', '20', '30', '50', '100'], defaultPageSize: '10' }}
+        />
+      </Form>
+    
+  )
 }
 
 export default TableAnt
-export { columns }
+//export { columns }
