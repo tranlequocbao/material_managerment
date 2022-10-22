@@ -41,13 +41,11 @@ const EditableCell = ({
 };
 
 function TableAnt(props) {
-  console.log(props)
   const {setColumns,checkNow}=useContext(setColumn)
   const [dataTable,setDataTable]=useState('')
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
-
   ///... form for edit cell table
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState('')
@@ -64,7 +62,6 @@ function TableAnt(props) {
     });
   };
 
-  console.log(checkNow)
   const onSubmitModify = async (value) => {
     try {
       const row = await form.validateFields();
@@ -92,30 +89,24 @@ function TableAnt(props) {
     }
     
   }
-  
   const edit = (record) => {
     form.setFieldsValue({
       ...record,
     });
     setEditingKey(record.key);
   };
-
-
   const cancel = () => {
     setEditingKey('');
   };
-
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
   };
-
   const handleReset = (clearFilters) => {
     clearFilters();
     setSearchText('');
   };
-
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
       <div
@@ -200,7 +191,6 @@ function TableAnt(props) {
         text
       ),
   });
-
   const columns = [
     {
       title: 'Mã vật tư',
@@ -354,7 +344,6 @@ function TableAnt(props) {
       }),
     };
   });
-
   return (
     
       <Form form={form} component={false}>
@@ -374,6 +363,5 @@ function TableAnt(props) {
     
   )
 }
-
 export default TableAnt
 //export { columns }

@@ -258,7 +258,6 @@ function Exist() {
 
   //hàm lấy số liệu trong 1 ngày
   const returnDataEx = (date) => {
-    //console.log(date)
     var result = 0
     var arraylist = historyExIm.filter(da => new Date(da.created_at).getMonth() == new Date(date).getMonth() && da.name_action == 'Xuất')
     arraylist.map((val, index) => {
@@ -471,7 +470,7 @@ function Exist() {
               </div>
               <div>
                 <Button variant="warning" onClick={handleCloseExist} style={{ marginRight: '20px' }}>CHỐT TỒN KHO</Button>
-                <Button onClick={handleDownloadExcel}>export</Button>
+                <Button onClick={handleDownloadExcel}>XUẤT EXCEL</Button>
               </div>
             </Col>
           </Row>

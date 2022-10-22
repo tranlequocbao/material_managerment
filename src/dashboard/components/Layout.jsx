@@ -2,15 +2,18 @@ import React, { useEffect, useState } from 'react'
 import { Col, Divider, Row, Button, Tooltip, Modal, Input, notification } from 'antd';
 import '../Styles/Layout.css'
 import axios from 'axios';
-import { AppstoreAddOutlined } from '@ant-design/icons'
+import { AppstoreAddOutlined, DownloadOutlined } from '@ant-design/icons'
 import { useFormik } from 'formik';
 import * as Yup from 'yup'
+import { ButtonGroup } from 'react-bootstrap';
 
 function Layouts() {
 
     const [data, setData] = useState([])
     const [array, setArray] = useState([])
-    const name=[]
+    const [extendInfoLayout, setExtendInfoLayout] = useState(true)
+    const [checkExtend,setCheckExtend]=useState('')
+    const name = []
     var idMaterial = '';
     var arrayIDMaterial = new Array([])
     var idMaterial_ = []
@@ -57,6 +60,7 @@ function Layouts() {
     }, [data])
 
     function getData() {
+        console.log('aaa')
         axios.post('http://113.174.246.52:8082/api/returnInfoLayout_materialManagerment')
             .then((res) => {
                 const database = res.data
@@ -78,8 +82,7 @@ function Layouts() {
     const formik = useFormik({
         initialValues: {
             id: ''
-        }
-        ,
+        },
         validationSchema: Yup.object({
             id: Yup.string().required('Vui lòng nhập mã vị trí'),
         }),
@@ -104,14 +107,12 @@ function Layouts() {
     }
     const returnIdMaterial = (data) => {
         const result = []
-     
+
         for (var key in data) {
-            console.log( )
             result.push(
                 <Tooltip key={key} placement="right" title={name[data[key]]} arrowPointAtCenter>
                     <div style={style} className='mb-2'>
                         {data[key]}
-
                     </div>
                 </Tooltip>
             )
@@ -121,23 +122,40 @@ function Layouts() {
     var lenght = data.length
 
     const returnName = (data) => {
-        
+
         for (var key in data) {
             name[data[key]['id_material']] = data[key]['name']
         }
     }
-    data&&returnName(data)
+    data && returnName(data)
+    const handleExtendInfoLayout = (event) => {
+        if(extendInfoLayout===true){
+            setCheckExtend(event.currentTarget.id)
+            setExtendInfoLayout(false)
+        }
+      
+       else{
+        setCheckExtend('')
+        setExtendInfoLayout(true)
+       }
+    }
+    
     const resultLayout = (data) => {
         const resut = []
-        
+
         for (var key of Object.keys(data)) {
+           
             resut.push(
                 <Col key={key} className="gutter-row" span={4} >
+                
                     <div className='cell'>
                         <div>Vị trí: {key}</div>
-                        {
-                            returnIdMaterial(data[key])
-                        }
+                        <Button type="primary" id={key} shape="round" icon={<DownloadOutlined />} size={'large'} onClick={handleExtendInfoLayout}>
+                            
+                        </Button>
+                        <div className={checkExtend===key?'':'hide'}>
+                                {data&&returnIdMaterial(data[key])}
+                        </div>
                     </div>
                 </Col>
             )

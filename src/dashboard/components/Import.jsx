@@ -17,9 +17,9 @@ function Import() {
   const [positions, setPositions] = useState('')
   const [position, setPosition] = useState('')
   const [status, setStatus] = useState('insert')
-  const [barcode,setBarcode]=useState('')
-  const [totalPrice,setTotalPrice]=useState(0)
-  const {setPage}=useContext(UserContext)
+  const [barcode, setBarcode] = useState('')
+  const [totalPrice, setTotalPrice] = useState(0)
+  const { setPage } = useContext(UserContext)
   const initData = {
     id: '',
     name: '',
@@ -42,7 +42,7 @@ function Import() {
       id: Yup.string().required('Vui lòng nhập mã vật tư'),
       name: Yup.string().required('Tên vật tư không để trống'),
       amount: Yup.string().required('Nhập số lượng vào dùm'),
-      unitPrice:Yup.string().required('Vui lòng nhập đơn giá'),
+      unitPrice: Yup.string().required('Vui lòng nhập đơn giá'),
       supplier: Yup.string().required('Nhập nhà cung cấp')
     }),
     onSubmit: (values, { resetForm }) => {
@@ -73,22 +73,24 @@ function Import() {
   }
   //console.log(img)
   //submit vào csld
-  const Print = () =>{     
+  const Print = (name) => {
     var divContents = document.getElementById("barcode").innerHTML;
     var a = window.open('', '', 'height=500, width=500');
     a.document.write('<html>');
-    a.document.write('<body > <h1>Div contents are <br>');
+    a.document.write(`<body class="printBarcode"><div class="bodyBarcode" style=" text-align: center;width: 350px;"> 
+    <h3 clas="titleBarcode" style="margin: 0;display: contents">${name}</h3>
+    <br>`);
     a.document.write(divContents);
-    a.document.write('</body></html>');
+    a.document.write('</div></body></html>');
     a.document.close();
     a.print();
   }
 
   const handleSubmit = (values, { resetForm }) => {
-    
-   
-    if(formik.values.id===''){
-      openNotification('Kiểm tra lại mã ID','error')
+
+
+    if (formik.values.id === '') {
+      openNotification('Kiểm tra lại mã ID', 'error')
       return false
     }
     formik.values['img'] = img;
@@ -109,12 +111,11 @@ function Import() {
           openNotification("THÊM DỮ LIỆU THẤT BẠI", 'error',)
         }
         else {
-          
           openNotification("THÊM DỮ LIỆU THÀNH CÔNG", 'success',)
           setImg('')
           setTotalPrice(0)
           resetForm({ values: '' })
-          Print()
+          Print(formik.values.name)
         }
       })
     }
@@ -126,37 +127,36 @@ function Import() {
           openNotification("CẬP NHẬT LIỆU THẤT BẠI", 'error',)
         }
         else {
-          let newPromise = new Promise(function(res,rej){
+          let newPromise = new Promise(function (res, rej) {
             setTimeout(() => {
-              Print()
+              Print(formik.values.name)
               res(true)
             }, 1000);
           })
           newPromise.
-          then(function(value){
-            openNotification("CẬP NHẬT LIỆU THÀNH CÔNG", 'success',)
-            setImg('')
-            resetForm({ values: '' })
-            setPage('import')
-          })
-         
-          
+            then(function (value) {
+              openNotification("CẬP NHẬT LIỆU THÀNH CÔNG", 'success',)
+              setImg('')
+              resetForm({ values: '' })
+              setPage('import')
+            })
+
+
         }
       })
     }
-    
+
   }
   //get thành tiền
-const handleTotalPrice=()=>{
-  setTotalPrice(parseInt(formik.values.amount)*parseInt(formik.values.unitPrice))
-}
+  const handleTotalPrice = () => {
+    setTotalPrice(parseInt(formik.values.amount) * parseInt(formik.values.unitPrice))
+  }
   // get value select
   const handleSelect = (values) => {
     setUnit(values)
   }
   //get value select position
   const handleSelectPosition = (values) => {
-    console.log(values)
     setPosition(values)
   }
   //load vị trí rỗng
@@ -178,42 +178,39 @@ const handleTotalPrice=()=>{
       }).then((response) => {
 
         const data = response.data[0]
-        
+
         if (data) {
-          setBarcode(<Barcode value={data.id} />)
-  
+          setBarcode(<Barcode
+            height={50}
+            width={5}
+            value={data.id}
+
+          />)
+
           formik.setFieldValue('name', data.name)
-          
+
           setUnit(data.unit)
-         
+
           formik.setFieldValue('amount', data.amount)
-        
-          console.log(data)
-      
-          formik.setFieldValue('unitPrice', data.unit_price)
-           
+          formik.setFieldValue('unitPrice', parseInt(data.unit_price))
           formik.setFieldValue('idType', data.id_type)
-         
           formik.setFieldValue('device', data.device)
-      
           formik.setFieldValue('group', data.groups_material)
-        
           formik.setFieldValue('dept', data.dept)
-   
           formik.setFieldValue('otherName', data.other_name)
           formik.setFieldValue('supplier', data.supplier)
-        
+
           data.img && setImg(data.img)
-          if (data.id_layouyt != 'NULL'){
+          if (data.id_layouyt != 'NULL') {
             setPosition(data.id_layout)
             // setPositions([{ id: data.id_layout }])
           }
-          else{
+          else {
             setPosition(positions[0].id)
           }
           setStatus('update')
-        
-          setTotalPrice(parseInt(data.amount)*parseInt(data.unit_price))
+
+          setTotalPrice(parseInt(data.amount) * parseInt(data.unit_price))
         }
       })
     }
@@ -250,13 +247,13 @@ const handleTotalPrice=()=>{
 
   return (
     <MDBContainer>
-    <MDBRow className='mb-3'>
-      <MDBCol className='md'>
-        {`Tồn kho: ${formik.values.amount}  `} 
-        
-        {`Vị trí: ${position}`}
-      </MDBCol>
-    </MDBRow>
+      <MDBRow className='mb-3'>
+        <MDBCol className='md'>
+          {`Tồn kho: ${formik.values.amount}  `}
+
+          {`Vị trí: ${position}`}
+        </MDBCol>
+      </MDBRow>
       <form onSubmit={formik.handleSubmit}>
         <MDBRow className='mb-3'>
           <MDBCol size='md-2'>
@@ -338,7 +335,7 @@ const handleTotalPrice=()=>{
               value={formik.values.supplier}
               onChange={formik.handleChange}
               label='Nhà cung cấp' type='text' size='lg' />
-              {formik.errors.supplier && (<p className='error'>{formik.errors.supplier}</p>)}
+            {formik.errors.supplier && (<p className='error'>{formik.errors.supplier}</p>)}
           </MDBCol>
           <MDBCol size='md-6'>
             <MDBInput
@@ -362,22 +359,23 @@ const handleTotalPrice=()=>{
           </MDBCol>
           <MDBCol size='md-2'>
             <MDBInput
+              type='number'
               id='unitPrice'
               name='unitPrice'
               value={formik.values.unitPrice}
               onChange={formik.handleChange}
               onBlur={handleTotalPrice}
-              label='Đơn giá' type='text' size='lg' />
-               {formik.errors.unitPrice && (<p className='error'>{formik.errors.unitPrice}</p>)}
+              label='Đơn giá' size='lg' />
+            {formik.errors.unitPrice && (<p className='error'>{formik.errors.unitPrice}</p>)}
           </MDBCol>
           <MDBCol size='md-2'>
             <MDBInput
               id='totalPrice'
               name='totalPrice'
               value={totalPrice}
-              label='Thành tiền' type='text' size='lg' 
+              label='Thành tiền' type='text' size='lg'
               disabled={true}
-              />
+            />
           </MDBCol>
           <MDBCol size='md-2' className='positionLayout'>
             <div>Vị trí</div>
@@ -400,7 +398,7 @@ const handleTotalPrice=()=>{
           </MDBCol>
         </MDBRow>
         <MDBRow className='mb-3' >
-        <MDBCol size='md-8'>
+          <MDBCol size='md-8'>
             <div className='upload'>
               <input type="file" className="form-control" accept="image/*;capture=camera" onChange={handleUpload} id="customFile" />
             </div>
@@ -431,7 +429,7 @@ const handleTotalPrice=()=>{
         </MDBRow>
       </form>
 
-      {barcode&&<div id='barcode'>{barcode}</div>}
+      {barcode && <div id='barcode'>{barcode}</div>}
     </MDBContainer>
   )
 }

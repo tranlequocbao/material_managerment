@@ -9,7 +9,6 @@ function App() {
     return localStorage.getItem('msnv')?true:false
     
   }
-  console.log(msnv())
   return (
     <div className="App">
      <Loginform/>
