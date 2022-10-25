@@ -15,7 +15,7 @@ import { notification, DatePicker } from 'antd'
 import { downloadExcel } from 'react-export-table-to-excel'
 import { Pie } from 'react-chartjs-2'
 import { Line } from 'react-chartjs-2'
-import 'chartjs-plugin-datalabels';
+
 import TableAnt from './table/Table'
 import axios from 'axios';
 import { columns } from './table/Table'
