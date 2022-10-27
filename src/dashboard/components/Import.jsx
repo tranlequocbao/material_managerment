@@ -103,6 +103,9 @@ function Import() {
     formik.values['position'] = position;
     formik.values['user'] = JSON.parse(localStorage.getItem('user'))
     let data = formik.values
+
+    console.log(status)
+   
     if (status == 'insert') {
       axios.post('http://113.174.246.52:8082/api/import_materialManagerment', {
         data: data
@@ -173,6 +176,12 @@ function Import() {
   //load thông tin nếu mã id đã tồn tại
   const handleLoadId = () => {
     if (formik.values.id != '') {
+      setBarcode(<Barcode
+        height={50}
+        width={5}
+        value={formik.values.id}
+
+      />)
       axios.post('http://113.174.246.52:8082/api/returnInfoID_materialManagerment', {
         id: formik.values.id
       }).then((response) => {
@@ -180,12 +189,7 @@ function Import() {
         const data = response.data[0]
 
         if (data) {
-          setBarcode(<Barcode
-            height={50}
-            width={5}
-            value={data.id}
 
-          />)
 
           formik.setFieldValue('name', data.name)
 

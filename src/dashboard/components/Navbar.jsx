@@ -183,7 +183,7 @@ const Navbar = () => {
             textAlign: 'center',
           }}
         >
-          Made by GIẢI PHÁP ỨNG DỤNG Team 
+          Copyright 2022 © AS TEAM
         </Footer>
       </Layout>
     </Layout>
