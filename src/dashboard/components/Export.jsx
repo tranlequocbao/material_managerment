@@ -224,7 +224,7 @@ function Export() {
               value={formik.values.dept}
               onChange={formik.handleChange}
               label='Xưởng' type='text' size='lg'
-              disabled={true} />
+               />
           </MDBCol>
         </MDBRow>
         <MDBRow className='mb-3'>

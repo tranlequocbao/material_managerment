@@ -161,12 +161,21 @@ function TableExport(props) {
         sorter: (a, b) => a.position.length - b.position.length,
         sortDirections: ['descend', 'ascend'],
       },
+  
       {
         title: 'Ngày nhập',
         dataIndex: 'created_at',
         key: 'address',
         width: '10%',
         sorter: (a, b) => a.created_at.length - b.created_at.length,
+        sortDirections: ['descend', 'ascend'],
+      },
+      {
+        title: 'Xưởng',
+        dataIndex: 'dept',
+        key: 'address',
+        width: '10%',
+        sorter: (a, b) => a.dept.length - b.dept.length,
         sortDirections: ['descend', 'ascend'],
       },
 

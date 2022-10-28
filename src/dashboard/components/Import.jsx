@@ -292,13 +292,33 @@ function Import() {
                 }}
                 onChange={handleSelect}
               >
-                <Option value="Bịch">Bịch</Option>
-                <Option value="Bình">Bình</Option>
-                <Option value="Bô">Bô</Option>
-                <Option value="Cái">Cái</Option>
-                <Option value="Dây">Dây</Option>
-                <Option value="Sợi">Sợi</Option>
-                <Option value="Kg">Kg</Option>
+              <Option value='CÁI'>CÁI</Option>
+                <Option value='Kg'>Kg</Option>
+                <Option value='Bộ'>Bộ</Option>
+                <Option value='Mét'>Mét</Option>
+                <Option value='Cây'>Cây</Option>
+                <Option value='Vỉ'>Vỉ</Option>
+                <Option value='Cuộn'>Cuộn</Option>
+                <Option value='Sợi'>Sợi</Option>
+                <Option value='Ống'>Ống</Option>
+                <Option value='Viên'>Viên</Option>
+                <Option value='M2'>M2</Option>
+                <Option value='Tấm'>Tấm</Option>
+                <Option value='Hộp'>Hộp</Option>
+                <Option value='Vòng'>Vòng</Option>
+                <Option value='Chiếc'>Chiếc</Option>
+                <Option value='Thùng'>Thùng</Option>
+                <Option value='Cặp'>Cặp</Option>
+                <Option value='Phuy'>Phuy</Option>
+                <Option value='Can'>Can</Option>
+                <Option value='Tuýp'>Tuýp</Option>
+                <Option value='Lít'>Lít</Option>
+                <Option value='Bình'>Bình</Option>
+                <Option value='M3'>M3</Option>
+                <Option value='Bộ '>Bộ </Option>
+                <Option value='Bô'>Bô</Option>
+                <Option value='Bịch'>Bịch</Option>
+                <Option value='Lon'>Lon</Option>
               </Select>
               }
             </div>
