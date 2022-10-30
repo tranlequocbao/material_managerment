@@ -3,23 +3,27 @@ import { useState } from 'react';
 import Barcode from 'react-barcode/lib/react-barcode'
 import axios from 'axios';
 import { MDBInput, MDBContainer, MDBRow, MDBCol, MDBBtn } from 'mdb-react-ui-kit'
-import { Select, notification } from 'antd';
+import { Select, notification, Button, Modal } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import 'antd/dist/antd.css';
 import 'mdb-react-ui-kit/dist/css/mdb.min.css'
 import '../Styles/Import.css'
-import { useFormik } from 'formik';
+import { useFormik, yupToFormErrors } from 'formik';
 import * as Yup from 'yup'
 import { UserContext } from './Navbar'
+import Input from 'antd/lib/input/Input';
 function Import() {
   const { Option } = Select;
   const [img, setImg] = useState('')
-  const [unit, setUnit] = useState("Bộ")
+  const [unit, setUnit] = useState('')
   const [positions, setPositions] = useState('')
   const [position, setPosition] = useState('')
   const [status, setStatus] = useState('insert')
   const [barcode, setBarcode] = useState('')
   const [totalPrice, setTotalPrice] = useState(0)
   const { setPage } = useContext(UserContext)
+  const [arrayUnit, setArrayUnit] = useState([])
+  const [open, setOpen] = useState(false);
   const initData = {
     id: '',
     name: '',
@@ -49,8 +53,40 @@ function Import() {
       handleSubmit(values, { resetForm })
     }
   })
+  const formikModal=useFormik({
+    initialValues:{
+      nameUnit:''
+    },
+    validationSchema:Yup.object({
+      nameUnit:Yup.string().required('Nhập tên đơn vị')
 
+    }),
+    onSubmit:(values)=>{
+      handleSubmitAddUnit(values)
+    }
+  })
+  const handleSubmitAddUnit=(values)=>{
+    values = values.nameUnit
+   const result= arrayUnit.find(o => o.name.toUpperCase() === values.toUpperCase());
+    if(result!==undefined){
+      openNotification("ĐÃ TỒN TẠI ĐƠN VỊ NÀY", 'error',)
+    }
+    else{
+      axios.post('http://113.174.246.52:8082/api/addUnit_materialManagerment',{values:values}).then((res)=>{
+      if (res.data['errno']) {
+        openNotification("THÊM DỮ LIỆU THẤT BẠI", 'error',)
+      }
+      else {
+        openNotification("THÊM DỮ LIỆU THÀNH CÔNG", 'success',)
+        formikModal.values.nameUnit=''
+        getData()
+        setOpen(false);
 
+      }
+    })
+    }
+    
+  }
   // thông báo
   const openNotification = (status, type) => {
     notification[type]({
@@ -58,9 +94,6 @@ function Import() {
       description: status,
     });
   };
-
-
-
   function getBase64(file, cb) {
     let reader = new FileReader();
     reader.readAsDataURL(file);
@@ -87,7 +120,7 @@ function Import() {
   }
 
   const handleSubmit = (values, { resetForm }) => {
-
+    console.log('aa')
 
     if (formik.values.id === '') {
       openNotification('Kiểm tra lại mã ID', 'error')
@@ -104,8 +137,6 @@ function Import() {
     formik.values['user'] = JSON.parse(localStorage.getItem('user'))
     let data = formik.values
 
-    console.log(status)
-   
     if (status == 'insert') {
       axios.post('http://113.174.246.52:8082/api/import_materialManagerment', {
         data: data
@@ -167,11 +198,18 @@ function Import() {
     getData()
   }, [])
   function getData() {
-    axios.post('http://113.174.246.52:8082/api/returnLayoutEmpty_materialManagerment')
-      .then((res) => {
-        setPositions(res.data)
-        setPosition(res.data[0].id)
+    axios.post('http://113.174.246.52:8082/api/returnUnit_materialManagerment')
+      .then((resUnit) => {
+        setArrayUnit(resUnit.data)
+        unit == '' && setUnit(resUnit.data[0].name)
+        axios.post('http://113.174.246.52:8082/api/returnLayoutEmpty_materialManagerment')
+          .then((res) => {
+            setPositions(res.data)
+            setPosition(res.data[0].id)
+          })
       })
+
+
   }
   //load thông tin nếu mã id đã tồn tại
   const handleLoadId = () => {
@@ -220,8 +258,6 @@ function Import() {
     }
 
   }
-
-
   //load hình cho vật tư
   const handleUpload = (e) => {
 
@@ -247,14 +283,28 @@ function Import() {
     else setImg('')
 
   }
+  //function for modal
+  const showModal = () => {
+    setOpen(true);
+  };
 
+  const handleCancel = () => {
+    setOpen(false);
+  };
 
   return (
     <MDBContainer>
+      <Modal
+        title="Thêm đơn vị"
+        open={open}
+        onOk={formikModal.handleSubmit}
+        onCancel={handleCancel}
+      >
+        <Input id='nameUnit' name='nameUnit' value={formikModal.values.nameUnit} onChange={formikModal.handleChange}></Input>
+      </Modal>
       <MDBRow className='mb-3'>
         <MDBCol className='md'>
           {`Tồn kho: ${formik.values.amount}  `}
-
           {`Vị trí: ${position}`}
         </MDBCol>
       </MDBRow>
@@ -281,8 +331,8 @@ function Import() {
             {formik.errors.name && (<p className='error'>{formik.errors.name}</p>)}
           </MDBCol>
           <MDBCol size='md-2'>
-            <div className='unit'>
-              {<Select
+            <div className='unit' style={{ display: 'flex' }}>
+              <Select
                 id='unit'
                 name='unit'
                 value={unit}
@@ -292,35 +342,14 @@ function Import() {
                 }}
                 onChange={handleSelect}
               >
-              <Option value='CÁI'>CÁI</Option>
-                <Option value='Kg'>Kg</Option>
-                <Option value='Bộ'>Bộ</Option>
-                <Option value='Mét'>Mét</Option>
-                <Option value='Cây'>Cây</Option>
-                <Option value='Vỉ'>Vỉ</Option>
-                <Option value='Cuộn'>Cuộn</Option>
-                <Option value='Sợi'>Sợi</Option>
-                <Option value='Ống'>Ống</Option>
-                <Option value='Viên'>Viên</Option>
-                <Option value='M2'>M2</Option>
-                <Option value='Tấm'>Tấm</Option>
-                <Option value='Hộp'>Hộp</Option>
-                <Option value='Vòng'>Vòng</Option>
-                <Option value='Chiếc'>Chiếc</Option>
-                <Option value='Thùng'>Thùng</Option>
-                <Option value='Cặp'>Cặp</Option>
-                <Option value='Phuy'>Phuy</Option>
-                <Option value='Can'>Can</Option>
-                <Option value='Tuýp'>Tuýp</Option>
-                <Option value='Lít'>Lít</Option>
-                <Option value='Bình'>Bình</Option>
-                <Option value='M3'>M3</Option>
-                <Option value='Bộ '>Bộ </Option>
-                <Option value='Bô'>Bô</Option>
-                <Option value='Bịch'>Bịch</Option>
-                <Option value='Lon'>Lon</Option>
+                {
+                  arrayUnit && Object.keys(arrayUnit).map((val, index) =>
+
+                    (<Option key={index} value={arrayUnit[val].name}>{arrayUnit[val].name}</Option>)
+                  )
+                }
               </Select>
-              }
+              <Button icon={<PlusOutlined />} style={{ height: '100%' }} onClick={showModal}></Button>
             </div>
 
           </MDBCol>

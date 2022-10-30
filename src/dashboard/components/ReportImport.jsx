@@ -34,7 +34,7 @@ function ReportImport() {
 
   const filterData = (data) => {
     var result = []
-    data.map((val, index) => {
+    !data.errno!=''&&data.map((val, index) => {
         result.push({
           key: index,
           ...val
