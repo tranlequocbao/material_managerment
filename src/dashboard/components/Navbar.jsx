@@ -1,8 +1,5 @@
 import {
-  DesktopOutlined,
-  FileOutlined,
   PieChartOutlined,
-  TeamOutlined,
   UserOutlined,
   ExportOutlined,
   ImportOutlined,
@@ -18,11 +15,7 @@ import ReportExport from './ReportExport';
 import ReportImport from './ReportImport'
 import Layouts from './Layout'
 import React, { useState, useRef, useLayoutEffect,createContext } from 'react';
-
 import '../Styles/Dashboard.css'
-
-
-
 const { Header, Content, Footer, Sider } = Layout;
 
 function getItem(label, key, icon, children) {
@@ -62,9 +55,7 @@ const items = [
     'layout',
     <DatabaseOutlined />
   ),
-
 ];
-
 const Navbar = () => {
   //get width of window
   const targetRef = useRef();
@@ -74,7 +65,6 @@ const Navbar = () => {
   const [page, setPage] = useState('exist')
   const [title, setTitle] = useState("Báo cáo tồn Kho")
   useLayoutEffect(() => {
-
     if (targetRef.current) {
       setResponsive(targetRef.current.offsetWidth)
     }
@@ -91,7 +81,6 @@ const Navbar = () => {
     'reportExport':<ReportExport/>,
     'reportImport':<ReportImport/>,
   }
-  
   //console.log(components['exist'])
   return (
     <UserContext.Provider value={{
@@ -121,7 +110,6 @@ const Navbar = () => {
             setPage(e.key)
             setTitle(innerText)
           }}
-
         />
       </Sider>
       <Layout className="site-layout">
@@ -133,14 +121,12 @@ const Navbar = () => {
             justifyContent: 'space-between'
           }}
         >
-
           <div className='title'>{title}</div>
           <div className='navMenu' style={{ marginRight: '10px',display:'flex',marginLeft:'10px' }}>
           <div>
           <UserOutlined style={{display:'inline-flex',marginRight:'5px'}}/>
           {` ${JSON.parse(localStorage.getItem('user'))}`}
           </div>
-
             <a 
             className='logout'
             style={{ marginLeft: '10px', display: 'flex' }}
@@ -165,8 +151,6 @@ const Navbar = () => {
               margin: '16px 0',
             }}
           >
-            {/* <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item> */}
           </Breadcrumb>
           <div
             className="site-layout-background"
@@ -190,5 +174,4 @@ const Navbar = () => {
     </UserContext.Provider>
   )
 }
-
 export default Navbar;

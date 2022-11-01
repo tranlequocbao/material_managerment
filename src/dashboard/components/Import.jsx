@@ -136,25 +136,7 @@ function Import() {
     formik.values['position'] = position;
     formik.values['user'] = JSON.parse(localStorage.getItem('user'))
     let data = formik.values
-
-    if (status == 'insert') {
       axios.post('http://113.174.246.52:8082/api/import_materialManagerment', {
-        data: data
-      }).then((response) => {
-        if (response.data['errno']) {
-          openNotification("THÊM DỮ LIỆU THẤT BẠI", 'error',)
-        }
-        else {
-          openNotification("THÊM DỮ LIỆU THÀNH CÔNG", 'success',)
-          setImg('')
-          setTotalPrice(0)
-          resetForm({ values: '' })
-          Print(formik.values.name)
-        }
-      })
-    }
-    else if (status == 'update') {
-      axios.post('http://113.174.246.52:8082/api/update_materialManagerment', {
         data: data
       }).then((response) => {
         if (response.data['errno']) {
@@ -174,12 +156,8 @@ function Import() {
               resetForm({ values: '' })
               setPage('import')
             })
-
-
         }
       })
-    }
-
   }
   //get thành tiền
   const handleTotalPrice = () => {

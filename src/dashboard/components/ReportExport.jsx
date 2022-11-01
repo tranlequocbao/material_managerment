@@ -17,7 +17,6 @@ function ReportExport() {
     }
     getDataEx(dataDate)
   }, [dataDate])
-
   function getDataEx(dataDate) {
     if (dataDate != '') {
       let Type = 'Xuất'
@@ -29,7 +28,6 @@ function ReportExport() {
         })
     }
   }
-
   const filterData = (data) => {
     var result = []
    
@@ -48,7 +46,6 @@ function ReportExport() {
     columns.map((val, index) =>
       header.push(val.title)
     )
-
     downloadExcel({
       fileName: "bc nhap kho" + Date(),
       sheet: "ketqua",
@@ -61,7 +58,6 @@ function ReportExport() {
   }
   return (
     <div>
-
       <Row style={{ marginBottom: '20px' }}>
         <Col md={10}>
           <RangePicker
@@ -80,9 +76,6 @@ function ReportExport() {
       <Row>
         <TableExport value={filterData(dataEx ? dataEx : '')} />
       </Row>
-
-
-
     </div>
   )
 }

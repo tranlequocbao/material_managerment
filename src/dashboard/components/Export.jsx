@@ -15,7 +15,7 @@ function Export() {
   const { dataMaterial } = useContext(UserContext)
   const [img, setImg] = useState('')
   const [uniPrice, setUnitPrice] = useState([])
-  const [supplier,setSupplier]=useState([])
+  const [supplier, setSupplier] = useState([])
   var idMaterial = ''
   const initData = {
     id: '',
@@ -83,13 +83,13 @@ function Export() {
   }
   const handleSelectUnitPrice = (values) => {
 
-    var keyprop = uniPrice.indexOf(uniPrice.filter(da=>da.unit_price==values)[0])
-    setValueforFormik(keyprop,uniPrice)
+    var keyprop = uniPrice.indexOf(uniPrice.filter(da => da.unit_price == values)[0])
+    setValueforFormik(keyprop, uniPrice)
   }
-  const handleSelectSupplier=(values)=>{
-   
-    var keyprop = uniPrice.indexOf(uniPrice.filter(da=>da.supplier.toUpperCase()===values.toUpperCase())[0])
-    setValueforFormik(keyprop,uniPrice)
+  const handleSelectSupplier = (values) => {
+
+    var keyprop = uniPrice.indexOf(uniPrice.filter(da => da.supplier.toUpperCase() === values.toUpperCase())[0])
+    setValueforFormik(keyprop, uniPrice)
   }
   //load thông tin nếu mã id đã tồn tại
   const handleLoadId = () => {
@@ -103,7 +103,7 @@ function Export() {
       formik.values = initData
 
       setUnitPrice(data)
-      
+
       if (data) {
         setValueforFormik(0, data)
       }
@@ -167,8 +167,8 @@ function Export() {
               }
               onSelect={onSelect}
               value={formik.values.name}
-              
-              
+
+
             >
               <Input id='name' name='name' onChange={formik.handleChange} size="large" placeholder="Nhập tên vật tư" />
             </AutoComplete>
@@ -217,19 +217,19 @@ function Export() {
         </MDBRow>
         <MDBRow className='mb-3'>
           <MDBCol size='md-6'>
-          <Select
-             id='supplier'
-             name='supplier'
-             value={formik.values.supplier}
-             style={{
-               height: '100%',
-               width: '100%'
-             }}
-             onChange={handleSelectSupplier}
-           >
-             {uniPrice && uniPrice.map((val, index) => (<Option key={index} value={val.supplier}>{val.supplier}</Option>))}
+            <Select
+              id='supplier'
+              name='supplier'
+              value={formik.values.supplier}
+              style={{
+                height: '100%',
+                width: '100%'
+              }}
+              onChange={handleSelectSupplier}
+            ><Option value={''}>Chọn nhà Cung cấp</Option>)
+              {uniPrice && uniPrice.map((val, index) => (<Option key={index} value={val.supplier}>{val.supplier}</Option>))}
 
-           </Select>
+            </Select>
           </MDBCol>
           <MDBCol size='md-6'>
             <MDBInput
@@ -238,7 +238,7 @@ function Export() {
               value={formik.values.dept}
               onChange={formik.handleChange}
               label='Xưởng' type='text' size='lg'
-               />
+            />
           </MDBCol>
         </MDBRow>
         <MDBRow className='mb-3'>
@@ -253,24 +253,24 @@ function Export() {
             />
 
           </MDBCol>
-          <MDBCol size='md-4' style={{display:'flex'}}>
-         <MDBCol size='md-3'>Đơn giá</MDBCol>
-         <MDBCol size='md-8'>
-         <Select
-             id='unitPrice'
-             name='unitPrice'
-             value={formik.values.unitPrice}
-             style={{
-               height: '100%',
-               width: '100%'
-             }}
-             onChange={handleSelectUnitPrice}
-           >
-             {uniPrice && uniPrice.map((val, index) => (<Option key={index} value={val.unit_price}>{val.unit_price}</Option>))}
+          <MDBCol size='md-4' style={{ display: 'flex' }}>
+            <MDBCol size='md-3'>Đơn giá</MDBCol>
+            <MDBCol size='md-8'>
+              <Select
+                id='unitPrice'
+                name='unitPrice'
+                value={formik.values.unitPrice}
+                style={{
+                  height: '100%',
+                  width: '100%'
+                }}
+                onChange={handleSelectUnitPrice}
+              >
+                {uniPrice && uniPrice.map((val, index) => (<Option key={index} value={val.unit_price}>{val.unit_price}</Option>))}
 
-           </Select>
-         </MDBCol>
-            
+              </Select>
+            </MDBCol>
+
           </MDBCol>
           <MDBCol size='md-2' className='positionLayout'>
             <MDBInput
@@ -283,6 +283,35 @@ function Export() {
           </MDBCol>
         </MDBRow>
 
+        <MDBRow className='mb-3'>
+          <MDBCol size='md-4'>
+            <MDBInput
+              id='purpose'
+              name='purpose'
+              value={formik.values.purpose}
+              onChange={formik.handleChange}
+              label='Mục đích sử dụng' type='text' size='lg'
+            />
+          </MDBCol>
+          <MDBCol size='md-4'>
+            <MDBInput
+              id='item'
+              name='item'
+              value={formik.values.item}
+              onChange={formik.handleChange}
+              label='Hạng mục sử dụng' type='text' size='lg'
+            />
+          </MDBCol>
+          <MDBCol size='md-3'>
+            <MDBInput
+              id='receiver'
+              name='receiver'
+              value={formik.values.receiver}
+              onChange={formik.handleChange}
+              label='Người nhận' type='text' size='lg'
+            />
+          </MDBCol>
+        </MDBRow>
 
         <MDBRow className='mb-3' >
           <MDBRow className='mb-3' ></MDBRow>
@@ -298,9 +327,7 @@ function Export() {
         <MDBRow className='mb-3 ' >
           <MDBCol size='md-12' id='import'>
             <div className='d-flex justify-content-center' >
-              <MDBBtn rounded type='submit' className='mx-2' color='primary'
-              // onClick={formik.handleSubmit}
-              >
+              <MDBBtn rounded type='submit' className='mx-2' color='primary'>
                 XUẤT KHO
               </MDBBtn>
             </div>

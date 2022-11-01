@@ -327,7 +327,6 @@ function TableAnt(props) {
         );
       }),
     },
-
   ];
   const mergedColumns = columns.map((col) => {
     if (!col.editable) {
