@@ -80,7 +80,7 @@ function ReportImport() {
         </Col>
       </Row>
       <Row>
-        <TableExport value={filterData(dataIm ? dataIm : '')} />
+        <TableExport value={filterData(dataIm ? dataIm : '')} type={'import'} />
       </Row>
 
 

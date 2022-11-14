@@ -60,7 +60,6 @@ function Layouts() {
     }, [data])
 
     function getData() {
-        console.log('aaa')
         axios.post('http://113.174.246.52:8082/api/returnInfoLayout_materialManagerment')
             .then((res) => {
                 const database = res.data

@@ -32,6 +32,9 @@ function Export() {
     img: '',
     position: '',
     unit: '',
+    purpose:'',
+    item:'',
+    receiver:''
   }
   //Khơi tạo biến formik
   const formik = useFormik({

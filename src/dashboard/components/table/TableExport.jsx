@@ -1,6 +1,7 @@
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, Input, Space, Table, Popconfirm, Typography, Form } from 'antd';
+import { Button, Input, Space, Table, Popconfirm, Typography, Form ,notification} from 'antd';
 import React, { useRef, useState } from 'react';
+import axios from 'axios';
 import Highlighter from 'react-highlight-words';
 const EditableCell = ({
   editing,
@@ -44,40 +45,67 @@ function TableExport(props) {
   const searchInput = useRef(null);
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState('')
+  const [dataTable,setDataTable]=useState([])
   const isEditing = (record) => record.key === editingKey;
+
+  React.useEffect(()=>{
+    setDataTable(props.value)
+  },[props.value])
   const edit = (record) => {
     form.setFieldsValue({
       ...record,
     });
     setEditingKey(record.key);
   };
+
+
+    // thông báo
+    const openNotification = (status, type) => {
+      notification[type]({
+        message: 'THÔNG BÁO',
+        description: status,
+      });
+    };
   const onSubmitModify = async (value) => {
-    // try {
-    //   const row = await form.validateFields();
-    //   const newData =[...props.value]
-    //   const index = newData.findIndex((items)=>value['key']===items.key)
-    //   const values={'id':value['id'],'supplierOld':value['supplier'],'unit_price':value['unit_price'],'idLayoutOld':value['id_layout'],...row}
-    //   const item = newData[index];
-    //   newData.splice(index, 1, {
-    //     ...item,
-    //     ...row,
-    //   });
-    //       axios.post('http://113.174.246.52:8082/api/modifyInfo_materialManagerment', { values })
-    //   .then((res) => {
-    //     if (res.data['errno']) {
-    //       openNotification("THÊM DỮ LIỆU THẤT BẠI", 'error',)
-    //       setEditingKey('');
-    //     }
-    //     else
-    //       openNotification("HIỆU CHỈNH DỮ LIỆU THÀNH CÔNG", 'success',)
-    //       setDataTable(newData)
-    //       setEditingKey('');
-    //   })
-    // } catch (errInfo) {
-    //   console.log('Validate Failed:', errInfo);
-    // }
+    
+    try {
+      
+        const row = await form.validateFields();
+        const newData =[...props.value]
+        const index = newData.findIndex((items)=>value['key']===items.key)
+       var amount = row['amount']
+      var values={}
+       if(props.type==='import'){
+        
+        row['total_price']=parseInt(row['amount'])* parseInt(value['unit_price']) 
+        row['amount']=row['amount']-value['amount']
+        values={'id':value['id_material'],'supplier':value['supplier'],'unitPriceOld':value['unit_price'],'idLayout':value['position'],'amountOld':value['amount'],'datetime':value['created_at'],'type':props.type,...row}
+         row['amount']=amount
+       }
+       else  values={'id':value['id_material'],'supplier':value['supplier'],'unitPriceOld':value['unit_price'],'idLayout':value['position'],'amountOld':value['amount'],'datetime':value['created_at'],'type':props.type,...row}
+   
+        const item = newData[index];
+        newData.splice(index, 1, {
+          ...item,
+          ...row,
+        });  
+            axios.post('http://113.174.246.52:8082/api/modifyHis_materialManagerment', { values })
+        .then((res) => {
+          if (res.data['errno']) {
+            openNotification("THÊM DỮ LIỆU THẤT BẠI", 'error',)
+            setEditingKey('');
+          }
+          else
+            openNotification("HIỆU CHỈNH DỮ LIỆU THÀNH CÔNG", 'success',)
+            setEditingKey('');
+            setDataTable(newData)
+        })
+    } catch (errInfo) {
+      console.log('Validate Failed:', errInfo);
+    }
 
   }
+
   const cancel = () => {
     setEditingKey('');
   };
@@ -91,7 +119,7 @@ function TableExport(props) {
     clearFilters();
     setSearchText('');
   };
-
+  
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
       <div
@@ -182,21 +210,22 @@ function TableExport(props) {
       title: 'Mã vật tư',
       dataIndex: 'id_material',
       key: 'id',
-      width: '10%',
+      width: '20%',
+      fixed:'left',
       ...getColumnSearchProps('id_material'),
     },
     {
       title: 'Tên Hàng',
       dataIndex: 'name_material',
       key: 'name',
-      width: '20%',
+      width: '40%',
       ...getColumnSearchProps('name_material'),
     },
     {
       title: 'Người Nhập',
       dataIndex: 'person_action',
       key: 'address',
-      width: '10%',
+      width: '30%',
       sorter: (a, b) => a.person_action.length - b.person_action.length,
       sortDirections: ['descend', 'ascend'],
     },
@@ -207,22 +236,21 @@ function TableExport(props) {
       width: '10%',
       sorter: (a, b) => a.amount.length - b.amount.length,
       sortDirections: ['descend', 'ascend'],
-      editable: true,
     },
     {
       title: 'Đơn giá',
       dataIndex: 'unit_price',
       key: 'address',
-      width: '10%',
+      width: '20%',
       sorter: (a, b) => a.unit_price.length - b.unit_price.length,
       sortDirections: ['descend', 'ascend'],
-      editable: true,
+     
     },
     {
       title: 'Thành tiền',
       dataIndex: 'total_price',
       key: 'address',
-      width: '10%',
+      width: '20%',
       sorter: (a, b) => a.unit_price.length - b.unit_price.length,
       sortDirections: ['descend', 'ascend'],
     },
@@ -239,23 +267,66 @@ function TableExport(props) {
       title: 'Ngày nhập',
       dataIndex: 'created_at',
       key: 'address',
-      width: '10%',
+      width: '20%',
       sorter: (a, b) => a.created_at.length - b.created_at.length,
       sortDirections: ['descend', 'ascend'],
+      // render:(record)=>{
+      //   return ()
+      // }
     },
     {
       title: 'Xưởng',
       dataIndex: 'dept',
       key: 'address',
-      width: '10%',
+      width: '20%',
       sorter: (a, b) => a.dept.length - b.dept.length,
       sortDirections: ['descend', 'ascend'],
     },
+    {
+      title: 'Nhà Cung Cấp',
+      dataIndex: 'supplier',
+      key: 'supplier',
+      width: '30%',
+      sorter: (a, b) => a.supplier.length - b.supplier.length,
+      sortDirections: ['descend', 'ascend'],
+    },
+    {
+      title: 'Mục đích sử dụng',
+      dataIndex: 'purpose',
+      key: 'supplier',
+      width: '30%',
+      sorter: (a, b) => a.purpose.length - b.purpose.length,
+      sortDirections: ['descend', 'ascend'],
+      editable: props.type==='export'?true:false,
+    },
+    {
+      title: 'Hạng mục sử dụng',
+      dataIndex: 'item',
+      key: 'item',
+      width: '30%',
+      sorter: (a, b) => a.item.length - b.item.length,
+      sortDirections: ['descend', 'ascend'],
+      editable: props.type==='export'?true:false,
+    },
+    {
+      title: 'Người nhận',
+      dataIndex: 'receiver',
+      key: 'receiver',
+      width: '10%',
+      sorter: (a, b) => a.receiver.length - b.receiver.length,
+      sortDirections: ['descend', 'ascend'],
+      editable: props.type==='export'?true:false,
+    },
+  
     {
       title: 'Sửa',
       dataIndex: 'operation',
       width: '15%',
       render: ((_, record) => {
+       var currentMonth = new Date(record.created_at).getMonth()+1
+       var currentYear = new Date(record.created_at).getFullYear()
+       
+       if(currentMonth=== new Date().getMonth()+1&&currentYear=== new Date().getFullYear()){
         const editable = isEditing(record);
         return editable ? (
           <span>
@@ -275,7 +346,7 @@ function TableExport(props) {
           <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
             Hiệu chỉnh
           </Typography.Link>
-        );
+        );}
       }),
     },
 
@@ -305,7 +376,7 @@ function TableExport(props) {
         }}
         rowClassName="editable-row"
         columns={mergedColumns}
-        dataSource={props.value}
+        dataSource={dataTable&&dataTable}
         scroll={{ x: 'calc(700px + 50%)', y: 500 }}
         pagination={{ showSizeChanger: true, pageSizeOptions: ['10', '20', '30', '50', '100'], defaultPageSize: '10' }}
       />

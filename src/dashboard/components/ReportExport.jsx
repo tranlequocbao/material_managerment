@@ -11,6 +11,7 @@ function ReportExport() {
   const { RangePicker } = DatePicker;
   const [dataEx, setDataEx] = useState([])
   const [dataDate, setDataDate] = useState([])
+  const [currentMonth,setCurrentMonth]= useState(true)
   useEffect(() => {
     if (dataDate == '') {
       setDataDate([{ 'StartDay': `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`, 'EndDay': `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}` }])
@@ -41,6 +42,7 @@ function ReportExport() {
   }
   const onChange = (dates, dateStrings) => {
     setDataDate([{ StartDay: dateStrings[0], EndDay: dateStrings[1] }])
+    
   }
   const handleExportExcel = () => {
     columns.map((val, index) =>
@@ -74,7 +76,7 @@ function ReportExport() {
         </Col>
       </Row>
       <Row>
-        <TableExport value={filterData(dataEx ? dataEx : '')} />
+        <TableExport value={filterData(dataEx ? dataEx : '')} type ={'export'} />
       </Row>
     </div>
   )

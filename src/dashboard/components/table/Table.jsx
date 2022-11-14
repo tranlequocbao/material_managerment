@@ -41,18 +41,18 @@ const EditableCell = ({
 };
 
 function TableAnt(props) {
-  const {setColumns,checkNow}=useContext(setColumn)
-  const [dataTable,setDataTable]=useState('')
+  const { setColumns, checkNow } = useContext(setColumn)
+  const [dataTable, setDataTable] = useState('')
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
   ///... form for edit cell table
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState('')
-  React.useEffect(()=>{
+  React.useEffect(() => {
     setColumns(columns)
     setDataTable(props.value)
-  },[props.value])
+  }, [props.value])
   const isEditing = (record) => record.key === editingKey;
   // thông báo
   const openNotification = (status, type) => {
@@ -65,29 +65,29 @@ function TableAnt(props) {
   const onSubmitModify = async (value) => {
     try {
       const row = await form.validateFields();
-      const newData =[...props.value]
-      const index = newData.findIndex((items)=>value['key']===items.key)
-      const values={'id':value['id'],'supplierOld':value['supplier'],'unit_price':value['unit_price'],'idLayoutOld':value['id_layout'],...row}
+      const newData = [...props.value]
+      const index = newData.findIndex((items) => value['key'] === items.key)
+      const values = { 'id': value['id'], 'supplierOld': value['supplier'], 'unit_price': value['unit_price'], 'idLayoutOld': value['id_layout'], ...row }
       const item = newData[index];
       newData.splice(index, 1, {
         ...item,
         ...row,
       });
-          axios.post('http://113.174.246.52:8082/api/modifyInfo_materialManagerment', { values })
-      .then((res) => {
-        if (res.data['errno']) {
-          openNotification("THÊM DỮ LIỆU THẤT BẠI", 'error',)
-          setEditingKey('');
-        }
-        else
-          openNotification("HIỆU CHỈNH DỮ LIỆU THÀNH CÔNG", 'success',)
+      axios.post('http://113.174.246.52:8082/api/modifyInfo_materialManagerment', { values })
+        .then((res) => {
+          if (res.data['errno']) {
+            openNotification("THÊM DỮ LIỆU THẤT BẠI", 'error',)
+            setEditingKey('');
+          }
+          else
+            openNotification("HIỆU CHỈNH DỮ LIỆU THÀNH CÔNG", 'success',)
           setDataTable(newData)
           setEditingKey('');
-      })
+        })
     } catch (errInfo) {
       console.log('Validate Failed:', errInfo);
     }
-    
+
   }
   const edit = (record) => {
     form.setFieldsValue({
@@ -196,15 +196,16 @@ function TableAnt(props) {
       title: 'Mã vật tư',
       dataIndex: 'id',
       key: 'id',
-      width: '10%',
+      width: '20%',
+      fixed: 'left',
       ...getColumnSearchProps('id'),
     },
     {
       title: 'Tên Hàng',
       dataIndex: 'name',
-      width: '20%',
+      width: '50%',
       key: 'name',
-      editable: checkNow&&true,
+      editable: checkNow && true,
       ...getColumnSearchProps('name'),
     },
     {
@@ -304,7 +305,7 @@ function TableAnt(props) {
       title: 'Sửa',
       dataIndex: 'operation',
       width: '15%',
-      render: checkNow&& ( (_, record) => {
+      render: checkNow && ((_, record) => {
         const editable = isEditing(record);
         return editable ? (
           <span>
@@ -344,22 +345,24 @@ function TableAnt(props) {
     };
   });
   return (
-    
-      <Form form={form} component={false}>
-        <Table
-          components={{
-            body: {
-              cell: EditableCell,
-            },
-          }}
-          rowClassName="editable-row"
-          columns={mergedColumns}
-          dataSource={dataTable&&dataTable}
-          scroll={{ x: 'calc(700px + 50%)', y: 500 }}
-          pagination={{ showSizeChanger: true, pageSizeOptions: ['10', '20', '30', '50', '100'], defaultPageSize: '10' }}
-        />
-      </Form>
-    
+
+    <Form form={form} component={false}>
+      <Table
+        components={{
+          body: {
+            cell: EditableCell,
+          },
+        }}
+        rowClassName="editable-row"
+        columns={mergedColumns}
+        bordered
+        size="middle"
+        dataSource={dataTable && dataTable}
+        scroll={{ x: 'calc(700px + 50%)', y: 500 }}
+        pagination={{ showSizeChanger: true, pageSizeOptions: ['10', '20', '30', '50', '100'], defaultPageSize: '10' }}
+      />
+    </Form>
+
   )
 }
 export default TableAnt

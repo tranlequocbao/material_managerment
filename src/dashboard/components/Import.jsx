@@ -120,7 +120,6 @@ function Import() {
   }
 
   const handleSubmit = (values, { resetForm }) => {
-    console.log('aa')
 
     if (formik.values.id === '') {
       openNotification('Kiểm tra lại mã ID', 'error')
