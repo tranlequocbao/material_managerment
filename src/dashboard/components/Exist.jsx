@@ -36,8 +36,9 @@ function Exist() {
   const [historyExIm, sethistoryExIm] = useState([])
   const [arrayLayout, setArrayLayout] = useState([])
   const [checkNow,setCheckNow]=useState(true)
- 
-  React.useEffect(() => {
+ const levelUser =JSON.parse( localStorage.getItem('level')
+) 
+React.useEffect(() => {
     header = []
     body = []
     getData()
@@ -469,7 +470,7 @@ function Exist() {
                 <h2>BẢNG TỒN KHO</h2>
               </div>
               <div>
-                <Button variant="warning" onClick={handleCloseExist} style={{ marginRight: '20px' }}>CHỐT TỒN KHO</Button>
+      { levelUser<3&&<Button variant="warning" onClick={handleCloseExist} style={{ marginRight: '20px' }}>CHỐT TỒN KHO</Button>}
                 <Button onClick={handleDownloadExcel}>XUẤT EXCEL</Button>
               </div>
             </Col>

@@ -27,35 +27,6 @@ function getItem(label, key, icon, children) {
   };
 }
 export const UserContext = createContext();
-const items = [
-  getItem(
-    <Tooltip placement="right" title="Báo cáo tồn kho" arrowPointAtCenter>Báo cáo tồn kho</Tooltip>,
-    'exist',
-    <PieChartOutlined />
-  ),
-  getItem(
-    <Tooltip placement="right" title="Báo cáo nhập xuất kho" arrowPointAtCenter>Nhập Kho</Tooltip>,
-    'expImp',
-    <PieChartOutlined />,
-    [
-      getItem(<Tooltip placement="right" title="Nhập Kho" arrowPointAtCenter>Nhập kho</Tooltip>, 'import', <ImportOutlined />),
-      getItem(<Tooltip placement="right" title="Báo cáo Nhập kho" arrowPointAtCenter>Báo cáo Nhập kho</Tooltip>, 'reportImport', <ExportOutlined />)
-    ]
-  ),
-  getItem(
-    <Tooltip placement="right" title="Xuất Kho" arrowPointAtCenter>
-      Xuất Kho
-    </Tooltip>
-    , 'sub1', <UserOutlined />, [
-      getItem(<Tooltip placement="right" title="Xuất Kho" arrowPointAtCenter>Xuất kho</Tooltip>, 'export', <ImportOutlined />),
-      getItem(<Tooltip placement="right" title="Báo cáo Xuất kho" arrowPointAtCenter>Báo cáo Xuất kho</Tooltip>, 'reportExport', <ExportOutlined />)
-  ]),
-  getItem(
-    <Tooltip placement="right" title="Vị trí tại kho" arrowPointAtCenter>Khai báo vị trí</Tooltip>,
-    'layout',
-    <DatabaseOutlined />
-  ),
-];
 const Navbar = () => {
   //get width of window
   const targetRef = useRef();
@@ -65,10 +36,11 @@ const Navbar = () => {
   const [page, setPage] = useState('exist')
   const [title, setTitle] = useState("Báo cáo tồn Kho")
   useLayoutEffect(() => {
+      console.log(targetRef.current.offsetWidth)
     if (targetRef.current) {
       setResponsive(targetRef.current.offsetWidth)
     }
-  }, []);
+  }, [targetRef.current]);
 
   const setResponsive = (witdh) => {
     witdh <= 760 ? setCollapsed(true) : setCollapsed(false)
@@ -82,6 +54,39 @@ const Navbar = () => {
     'reportImport':<ReportImport/>,
   }
   //console.log(components['exist'])
+ const levelUser =parseInt(JSON.parse( localStorage.getItem('level')))
+
+  levelUser&&  console.log(levelUser)
+
+const items = [
+  getItem(
+    <Tooltip placement="right" title="Báo cáo tồn kho" arrowPointAtCenter>Báo cáo tồn kho</Tooltip>,
+    'exist',
+    <PieChartOutlined />
+  ),
+  getItem(
+    <Tooltip placement="right" title="Báo cáo nhập xuất kho" arrowPointAtCenter>Nhập Kho</Tooltip>,
+    'expImp',
+    <PieChartOutlined />,
+    [
+     levelUser<3&& getItem(<Tooltip placement="right" title="Nhập Kho" arrowPointAtCenter>Nhập kho</Tooltip>, 'import', <ImportOutlined />),
+      getItem(<Tooltip placement="right" title="Báo cáo Nhập kho" arrowPointAtCenter>Báo cáo Nhập kho</Tooltip>, 'reportImport', <ExportOutlined />)
+    ]
+  ),
+  getItem(
+    <Tooltip placement="right" title="Xuất Kho" arrowPointAtCenter>
+      Xuất Kho
+    </Tooltip>
+    , 'sub1', <UserOutlined />, [
+       levelUser<3&&getItem(<Tooltip placement="right" title="Xuất Kho" arrowPointAtCenter>Xuất kho</Tooltip>, 'export', <ImportOutlined />),
+      getItem(<Tooltip placement="right" title="Báo cáo Xuất kho" arrowPointAtCenter>Báo cáo Xuất kho</Tooltip>, 'reportExport', <ExportOutlined />)
+  ]),
+   levelUser<3&&getItem(
+    <Tooltip placement="right" title="Vị trí tại kho" arrowPointAtCenter>Khai báo vị trí</Tooltip>,
+    'layout',
+    <DatabaseOutlined />
+  ),
+];
   return (
     <UserContext.Provider value={{
       dataMaterial,
@@ -134,7 +139,7 @@ const Navbar = () => {
               localStorage.clear()
               window.location.reload()
               }}
-              href=''
+              href='#'
             > 
             <div><LogoutOutlined style={{display:'inline-flex',marginRight:'5px'}}/></div> 
             Đăng xuất

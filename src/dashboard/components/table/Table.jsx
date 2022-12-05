@@ -1,6 +1,6 @@
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, Input, Space, Table, Form, notification, Popconfirm, Typography } from 'antd';
-import React, { useContext, useRef, useState } from 'react';
+import { Button, Input, Space, Table, Form, notification, Popconfirm, Typography, Modal } from 'antd';
+import React, { useContext, useRef, useState, } from 'react';
 import Highlighter from 'react-highlight-words';
 import axios from 'axios';
 import { setColumn } from '../Exist';
@@ -46,9 +46,13 @@ function TableAnt(props) {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [img, setImg] = useState('')
   ///... form for edit cell table
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState('')
+  const levelUser = parseInt(JSON.parse(localStorage.getItem('level')))
+  const [name,setName]=useState('')
   React.useEffect(() => {
     setColumns(columns)
     setDataTable(props.value)
@@ -60,6 +64,14 @@ function TableAnt(props) {
       message: 'THÔNG BÁO',
       description: status,
     });
+  };
+
+  //........MODAL..............
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
   };
 
   const onSubmitModify = async (value) => {
@@ -305,7 +317,7 @@ function TableAnt(props) {
       title: 'Sửa',
       dataIndex: 'operation',
       width: '15%',
-      render: checkNow && ((_, record) => {
+      render: levelUser && levelUser < 3 ? (checkNow && ((_, record) => {
         const editable = isEditing(record);
         return editable ? (
           <span>
@@ -326,9 +338,34 @@ function TableAnt(props) {
             Hiệu chỉnh
           </Typography.Link>
         );
-      }),
+      })) : '',
+    },
+    {
+      title: 'Xem ảnh',
+      dataIndex: 'operation',
+      width: '15%',
+      render: ((_, record) => {
+        return (
+          <span>
+            <Typography.Link onClick={() => onWatchImg(record)}>
+              Xem ảnh
+            </Typography.Link>
+          </span>
+        )
+      })
     },
   ];
+  const onWatchImg = (record) => {
+    axios.post('http://113.174.246.52:8082/api/returnInfoID_materialManagerment', {
+      id: record.id
+    }).then((response) => {
+      const img = response.data[0].img
+      const name =dataTable.filter(da=>da.id==record.id)[0].name
+      setImg(img)
+      setName(name)
+      showModal(true)
+    })
+  }
   const mergedColumns = columns.map((col) => {
     if (!col.editable) {
       return col;
@@ -345,23 +382,35 @@ function TableAnt(props) {
     };
   });
   return (
+    <>
+      <Modal title={name} open={isModalOpen} 
+        footer={[
+          <Button key="back" onClick={handleOk}>
+            Close
+          </Button>,
+         
+        ]}
+      >
+        <img src={img ? (img) : ''} alt='' className='img-fluid shadow-2-strong' />
+      </Modal>
+      <Form form={form} component={false}>
+        <Table
+          components={{
+            body: {
+              cell: EditableCell,
+            },
+          }}
+          rowClassName="editable-row"
+          columns={mergedColumns}
+          bordered
+          size="middle"
+          dataSource={dataTable && dataTable}
+          scroll={{ x: 'calc(700px + 50%)', y: 500 }}
+          pagination={{ showSizeChanger: true, pageSizeOptions: ['10', '20', '30', '50', '100'], defaultPageSize: '10' }}
+        />
+      </Form>
+    </>
 
-    <Form form={form} component={false}>
-      <Table
-        components={{
-          body: {
-            cell: EditableCell,
-          },
-        }}
-        rowClassName="editable-row"
-        columns={mergedColumns}
-        bordered
-        size="middle"
-        dataSource={dataTable && dataTable}
-        scroll={{ x: 'calc(700px + 50%)', y: 500 }}
-        pagination={{ showSizeChanger: true, pageSizeOptions: ['10', '20', '30', '50', '100'], defaultPageSize: '10' }}
-      />
-    </Form>
 
   )
 }
